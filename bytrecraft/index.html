@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <link rel="icon" type="image/png" href="logotest4.png">
+    <title>ByteCraft</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <header>
+        <a class="logo" href="#">
+            <img src="logotest4.png">
+            <span>ByteCraft</span>
+        </a>
+
+        <button id="singinbtn" style="margin-left: auto; opacity: 0; pointer-events: none;" class="button">Sign
+            in</button>
+        <button id="backmainstate" style="display: none;" class="button"><i class="fa-solid fa-arrow-left"></i></button>
+        <button id="profilebtn" style="display: none;" class="button">N</button>
+        
+    </header>
+    <div id="filter" class="filter">
+        <button style="border: thin solid rgb(255, 255, 255);">all</button>
+        <button>basic</button>
+        <button>array</button>
+        <button>dynamic</button>
+        <button>string</button>
+   </div>
+    <div id="main" class="main">
+        <div id="ad" class="ad">
+
+        </div>
+        <div id="problemcont" class="problemcont">
+
+        </div>
+        <div style="opacity: 0;" id="statecon" class="statecon">
+            <div id="innerstatecon" class="innerstatecon">
+                <h1 id="stateusername">-</h1>
+                <hr>
+                <canvas id="mychart1"></canvas>
+                <hr>
+                <canvas id="mychart2"></canvas>
+            </div>
+        </div>
+
+    </div>
+    <div id="mainstatecon" style="display: none;" class="mainstatecon">
+        <div>
+            <canvas id="unsolvedsolvedchart"></canvas>
+        </div>
+         <div>
+            <canvas id="varieyofquestoin"></canvas>
+        </div>
+        <div>
+            <canvas id="successrate"></canvas>
+        </div>
+         <div>
+            <canvas id="successandfail"></canvas>
+        </div>
+    </div>
+    <div id="auth" style="display: none;" class="auth">
+        <div class="authcontainer">
+            <h1>Sign in</h1>
+            <div>
+                <iframe src="https://lottie.host/embed/145a44ca-c173-4728-b4a0-989636b978cc/EmhniPRTUE.lottie"></iframe>
+            </div>
+            <div>
+                <img id="signin" src="googlelogo.png"
+                    style="width: 100px; display: block; margin: auto; cursor: pointer;" alt="">
+            </div>
+            <div class="closeauth" id="closeauth">
+                <i class="fa-solid fa-xmark"></i>
+            </div>
+        </div>
+    </div>
+    <div style="display: none;" class="profile" id="profile">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="12" fill="#E0E7FF" />
+            <path
+                d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z"
+                fill="#4F46E5" />
+            <path d="M12 13C7.58172 13 4 14.7909 4 17V18H20V17C20 14.7909 16.4183 13 12 13Z" fill="#4F46E5" />
+        </svg>
+        <hr>
+        <div id="closeprofile" class="closeprofile">
+            <i class="fa-solid fa-xmark"></i>
+        </div>
+        <h3 id="profileemail">E</h3>
+        <h4 id="profilename"> xyz</h4>
+        <h4 id="profilenumber">0</h4>
+        <h4 id="profiledob">0</h4>
+        <h4 id="profileaddress">none</h4>
+        <h4 id="profileprofesstion">none</h4>
+        <h4 id="profilesubmitted">none</h4>
+        <h4 style="color: gold; cursor: pointer;" id="opananalatics">none</h4>
+        <button style="margin: auto;" id="signout" class="button"><i class="fa-solid fa-arrow-right-from-bracket"></i>
+            Sign out</button>
+    </div>
+
+    <div style="display: none;" class="note" id="note">
+        <h2><b>NOTE</b></h2>
+        <h1 id="noteh1">..</h1>
+        <button style="margin: auto;" class="button" id="colsenote">OK</button>
+    </div>
+    <div id="loadcon" style="display: none;" class="loadcon">
+        <iframe src="https://lottie.host/embed/d00a8ad3-9a91-47b7-a81f-a20ce40a38e1/ikrYxwgQkz.lottie"></iframe>
+    </div>
+    <div style="display: none;" id="enterprifilecon" class="enterprifilecon">
+        <div class="profile-form">
+
+            <!-- SVG (YOUR FORMAT) -->
+            <div class="svg-box">
+                <svg style="width: 20%;" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="12" y="8" width="40" height="48" rx="4" fill="#F3F4F6" stroke="#374151" stroke-width="2" />
+                    <circle cx="32" cy="24" r="8" fill="#D1D5DB" stroke="#374151" stroke-width="2" />
+                    <rect x="20" y="38" width="24" height="4" rx="2" fill="#9CA3AF" />
+                    <rect x="20" y="46" width="16" height="4" rx="2" fill="#9CA3AF" />
+                    <circle cx="48" cy="52" r="10" fill="#10B981" />
+                    <path d="M44 52L47 55L52 49" stroke="white" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </div>
+
+            <h2>Complete Your Profile</h2>
+            <p>Please fill in the information below</p>
+
+            <form>
+
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="username" placeholder="Enter full name">
+                </div>
+
+                <div class="input-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="userphonenumber" placeholder="Enter phone number">
+                </div>
+
+                <div class="input-group">
+                    <label>Date of Birth</label>
+                    <input type="date" id="userdob">
+                </div>
+
+                <div class="input-group">
+                    <label>Address</label>
+                    <textarea placeholder="Enter address" id="useraddress"></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>Profession</label>
+                    <input type="text" id="userprofession" placeholder="Enter profession">
+                </div>
+
+                <div class="form-actions">
+                    <button style="margin: auto;" class="button" id="saveprofile">Save</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+
+
+    <script type="module" src="index.js"></script>
+</body>
+
+</html>

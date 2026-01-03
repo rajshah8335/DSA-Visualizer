@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Testspark</title>
+    <meta name="description"
+        content="AI‑assisted test generator for educators, trainers, and teams. Build quizzes, exams, and assessments in minutes. Export to PDF, Word, or LMS." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="image/logo.png">
+</head>
+
+<body>
+    <!-- Header / Nav -->
+    <header>
+        <div class="container nav">
+            <a href="index.html">
+                <div class="logo">
+                    <img src="image/logo.png" alt="logo">
+                </div>
+            </a>
+            <nav class="nav-links" aria-label="Primary">
+                <a href="#features">Features</a>
+                <a href="#how">How it works</a>
+            </nav>
+            <div class="nav-actions">
+                <button id="signin" style="display: none; margin-right: 10px;" class="btn btn-primary" href="">Sign
+                    in</button>
+                <button style="display: none; margin-right: 10px;" id="profilebtn" class="btn btn-primary">N</button>
+            </div>
+        </div>
+        <div id="mobileMenu" hidden class="container" style="padding-bottom:14px">
+            <div class="card" style="padding:12px 16px">
+                <a href="#features">Features</a> ·
+                <a href="#how">How it works</a> ·
+                <a href="#types">Question Types</a> ·
+                <a href="#pricing">Pricing</a> ·
+                <a href="#faq">FAQ</a>
+            </div>
+        </div>
+
+    </header>
+
+    <!-- profile -->
+
+    <div id="profile" style="display: none;" class="profile">
+        <button id="closeprofile"
+            style="float: right; border-radius: 5px; background-color: rgba(137, 43, 226, 0.329); border: none; cursor: pointer;"><i
+                class="fa-solid fa-xmark"></i></button>
+        <h4 style="margin: 0; color: rgba(0, 0, 0, 0.559);"><i class="fa-solid fa-envelope"></i>: <span
+                id="profileemail"></span></h4>
+        <h4 style="color: rgba(25, 0, 255, 0.559);"><a href="mytest.html"><i class="fa-regular fa-square-plus"></i>
+                Created test,s</a></h4>
+        <button id="signout" style="display: none; border-radius: 10px; margin: auto;" class="btn btn-primary"
+            href=""><i class="fa-solid fa-arrow-right-from-bracket"></i> sign out </button>
+    </div>
+
+
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container hero-grid">
+            <div>
+                <h2 class="headline">Build professional tests in minutes — not hours</h2>
+                <p class="subhead">Create quizzes, exams, and assessments with auto‑generated questions, instant answer
+                    keys, and one‑click export.</p>
+                <div class="action">
+                    <div onclick="window.location.href='createtest.html'">
+                        <div>
+
+                        </div>
+                        <h2>Create</h2>
+                    </div>
+                    <div onclick="window.location.href='attempt.html'">
+                        <div>
+
+                        </div>
+                        <h2>Attempt</h2>
+                    </div>
+                    <div onclick="window.location.href='aitest.html'">
+                        <div>
+
+                        </div>
+                        <h2>Ai</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="card mock" aria-hidden="true">
+                <div class="mock-inner">
+                    <div class="toolbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    </div>
+                    <div class="questiondemo">
+                        <div class="muted" style="font-size:.8rem; margin-bottom:6px">Multiple Choice</div>
+                        <b>Which data structure uses LIFO ordering?</b>
+                        <div style="display:grid; gap:8px; margin-top:10px">
+                            <label class="chip"><input type="radio" name="q1" /> Queue</label>
+                            <label class="chip"><input type="radio" name="q1" /> Stack</label>
+                            <label class="chip"><input type="radio" name="q1" /> Heap</label>
+                            <label class="chip"><input type="radio" name="q1" /> Graph</label>
+                        </div>
+                    </div>
+                    <div class="questiondemo">
+                        <div class="muted" style="font-size:.8rem; margin-bottom:6px">Short Answer</div>
+                        <b>Define polymorphism in OOP.</b>
+                        <div><input type="text" placeholder="Type your answer…"
+                                style="width:100%; background:transparent; border:1px solid var(--stroke); border-radius:10px; padding:.7rem; color:var(--text)" />
+                        </div>
+                    </div>
+                    <div class="questiondemo" style="display:grid; gap:8px">
+                        <div class="muted" style="font-size:.8rem; margin-bottom:6px">Matching</div>
+                        <b>Match the term with its description</b>
+                        <div class="chip">Array ↔ Fixed-size sequence</div>
+                        <div class="chip">HashMap ↔ Key-value store</div>
+                        <div class="chip">Stack ↔ LIFO</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features">
+        <div class="container">
+            <div class="section-head">
+                <h3 class="section-title">Everything you need to generate great tests</h3>
+                <p class="section-desc">From brainstorming questions to publishing the final paper — streamline every
+                    step with smart tools. Import topics, set difficulty and bloom level, add time limits, randomize
+                    questions, and generate answer keys automatically.</p>
+            </div>
+            <div class="grid grid-4">
+                <article class="card">
+                    <div class="content">
+                        <div class="icon">🧠</div>
+                        <h4>Question Builder</h4>
+                        <p class="muted">Give a topic or upload notes; get well‑structured items with distractors and
+                            rationales.</p>
+                    </div>
+                </article>
+                <article class="card">
+                    <div class="content">
+                        <div class="icon">🎯</div>
+                        <h4>Difficulty Control</h4>
+                        <p class="muted">Balance easy, medium, hard questions and align with learning objectives.</p>
+                    </div>
+                </article>
+                <article class="card">
+                    <div class="content">
+                        <div class="icon">🔀</div>
+                        <h4>Randomization & Pools</h4>
+                        <p class="muted">Create versions, shuffle choices, and pull from question banks safely.</p>
+                    </div>
+                </article>
+                <article class="card">
+                    <div class="content">
+                        <div class="icon">📤</div>
+                        <h4>One‑Click Export</h4>
+                        <p class="muted">In this you will get the code of that paper so you can share it to your
+                            friends.</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it works -->
+    <section id="how">
+        <div class="container">
+            <div class="section-head">
+                <h3 class="section-title">How it works</h3>
+                <p class="section-desc">The fastest path from idea to assessment.</p>
+            </div>
+            <div class="grid grid-3 steps">
+                <div class="card step">
+                    <div class="content">
+                        <h4>click on create</h4>
+                        <p class="muted">it will start go generate your quetion paper/p>
+                    </div>
+                </div>
+                <div class="card step">
+                    <div class="content">
+                        <h4>Add quetions</h4>
+                        <p class="muted">you can add any tipe of quetionss</p>
+                    </div>
+                </div>
+                <div class="card step">
+                    <div class="content">
+                        <h4>Generate & refine</h4>
+                        <p class="muted">Adjust difficulty, swap questions, add explanations, finalize layout.</p>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top:12px" class="muted">Optional: enable proctoring, set time limit, and define grading
+                rules.</div>
+        </div>
+    </section>
+
+    <!-- Question Types -->
+    <section id="types">
+        <div class="container">
+            <div class="section-head">
+                <h3 class="section-title">Supported question types</h3>
+                <p class="section-desc">Mix and match formats for objective and subjective evaluation.</p>
+            </div>
+            <div class="grid grid-4">
+                <div class="card">
+                    <div class="content"><span class="type-chip">Multiple Choice (single/multi)</span></div>
+                </div>
+                <div class="card">
+                    <div class="content"><span class="type-chip">True/False</span></div>
+                </div>
+                <div class="card">
+                    <div class="content"><span class="type-chip">Short Answer</span></div>
+                </div>
+                <div class="card">
+                    <div class="content"><span class="type-chip">Fill in the Blanks</span></div>
+                </div>
+                <div class="card">
+                    <div class="content"><span class="type-chip">Matching</span></div>
+                </div>
+                <div class="card">
+                    <div class="content"><span class="type-chip">Ordering/Sequencing</span></div>
+                </div>
+                <div class="card">
+                    <div class="content"><span class="type-chip">Coding (auto-eval)</span></div>
+                </div>
+                <div class="card">
+                    <div class="content"><span class="type-chip">Essay/Long form</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-grid">
+            <div>
+                <div class="brand">
+                    <div class="logo" aria-hidden="true"></div>
+                    <h4 style="margin:0">TestGen Pro</h4>
+                </div>
+                <p style="margin-top:10px">Build smarter tests with AI assistance. Export anywhere. Teach better.</p>
+            </div>
+            <div>
+                <h5>Product</h5>
+                <a href="#features">Features</a><br>
+                <a href="#pricing">Pricing</a><br>
+                <a href="#templates">Templates</a>
+            </div>
+            <div>
+                <h5>Company</h5>
+                <a href="#">About</a><br>
+                <a href="#">Blog</a><br>
+                <a href="#contact">Contact</a>
+            </div>
+            <div>
+                <h5>Legal</h5>
+                <a href="#">Terms</a><br>
+                <a href="#">Privacy</a><br>
+                <a href="#">Security</a>
+            </div>
+        </div>
+    </footer>
+
+    <div id="notification" class="notification">
+        <h3 id="load" style="margin: 0; color: rgba(0, 0, 0, 0.507); font-size: 15px;">No notification</h3>
+    </div>
+
+    <div id="loading" style="display: none;" class="loading">
+        <div style="text-align: center;">
+            <iframe class="loadlogo"
+                src="https://lottie.host/embed/0a9da3ea-6c14-48be-bb63-a4494a13464a/uOuRQtVJqH.lottie"></iframe>
+            <h2 id="loadh2"></h2>
+        </div>
+    </div>
+
+
+    <script type="module" src="main.js"></script>
+</body>
+
+</html>

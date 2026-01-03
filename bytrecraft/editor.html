@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="logotest4.png">
+
+    <title id="pagetitle">ByteCraft</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
+    <!-- C, C++, Java -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/clike/clike.min.js"></script>
+    <!-- JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/shell/shell.min.js"></script>
+
+    <!-- Python -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+    <!-- Bracket matching -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/matchbrackets.min.js"></script>
+    <!-- Auto close brackets -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closebrackets.min.js"></script>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.js"></script>
+
+    <!-- Language-specific hints -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/javascript-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/python-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/anyword-hint.min.js"></script>
+
+    <!-- ================= Icons ================= -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- ================= jQuery ================= -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- ================= Your Styles ================= -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+
+<body>
+    <header>
+        <a class="logo" href="index.html">
+            <img src="logotest4.png">
+            <span><b>ByteCraft</b></span>
+        </a>
+
+        <div class="controls">
+            <h3 style="position: relative; overflow: hidden;" title="number of poeple attempted">
+                <div id="skeleton-wrapperh3" class="skeleton-wrapper">
+                    <div class="skeleton-card">
+                    </div>
+                </div>
+                <i class="fa-solid fa-globe"></i> <span>Attempted</span> - <span id="attempted"></span>
+            </h3>
+            <button id="coderun" style="pointer-events: none;" class="button run" onclick="runTestCases()">
+                <i class="fas fa-play"></i>
+                <span>Run Tests</span>
+            </button>
+            <button class="button reset" onclick="resetCode()">
+                <i class="fas fa-redo"></i>
+                <span>Reset</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="main">
+        <div id="problem-container" class="problem-container">
+            <div class="skeleton-wrapper">
+                <div class="skeleton-card">
+                </div>
+            </div>
+        </div>
+
+        <div id="main-container" class="main-container">
+            <div id="editor-container" class="editor-container">
+                <div id="skeleton-wrapper" class="skeleton-wrapper">
+                    <div class="skeleton-card">
+                    </div>
+                </div>
+                <div class="editor-header">
+                    <div class="editor-title">
+                        <i class="fas fa-code"></i>
+                        <span>solution.c</span>
+                    </div>
+
+                    <div class="zoom-controls">
+                        <select id="langtype">
+                            
+                        </select>
+                        <button onclick="zoomIn()" title="Zoom In">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                        <button onclick="zoomOut()" title="Zoom Out">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button id="maximize">
+                            <i class="fa-solid fa-maximize"></i>
+                        </button>
+                        <button style="display: none;" id="minimize">
+                            <i class="fa-solid fa-minimize"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="code-wrapper">
+                    <textarea style="opacity: 0;" id="editor">
+</textarea>
+                </div>
+            </div>
+
+            <div class="output-container">
+                <div class="output-header">
+                    <div class="output-title">
+                        <i class="fas fa-terminal"></i>
+                        <span>Test Results</span>
+                    </div>
+                    <div class="test-results">
+                        <div class="test-result test-passed" id="passed-count">0 passed</div>
+                    </div>
+                </div>
+                <div id="output"></div>
+            </div>
+        </div>
+
+
+    </div>
+    <div style="display: none;" id="congrats" class="congrats">
+        <iframe src="https://lottie.host/embed/68b3c266-eede-4984-8a6e-00d2e3881f3e/h2Um33yQ9s.lottie"></iframe>
+    </div>
+
+    <script type="module" src="main.js">
+
+    </script>
+</body>
+
+</html>
