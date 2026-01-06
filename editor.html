@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="logotest4.png">
+
+    <title id="pagetitle">DSA Visualizer Editor</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
+    <!-- C, C++, Java -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/clike/clike.min.js"></script>
+    <!-- JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/shell/shell.min.js"></script>
+
+    <!-- Python -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+    <!-- Bracket matching -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/matchbrackets.min.js"></script>
+    <!-- Auto close brackets -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closebrackets.min.js"></script>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.js"></script>
+
+    <!-- Language-specific hints -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/javascript-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/python-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/anyword-hint.min.js"></script>
+
+    <!-- ================= Icons ================= -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- ================= jQuery ================= -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- ================= New Theme Styles ================= -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- ================= Editor Specific Overrides ================= -->
+    <style>
+        /* Re-implementing necessary layout styles from old style.css using new variables */
+        body {
+            overflow: hidden;
+            /* Keep editor fixed */
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-color);
+        }
+
+        .main {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            height: calc(100vh - 80px);
+            /* Adjust for navbar */
+            padding-top: 100px;
+            /* Push down below absolute navbar */
+        }
+
+        @media (max-width: 768px) {
+            .main {
+                flex-wrap: wrap;
+                padding-top: 120px;
+                height: auto;
+                overflow-y: auto;
+            }
+        }
+
+        /* Problem Section */
+        .problem-container {
+            position: relative;
+            padding: 20px;
+            width: 30%;
+            height: 85vh;
+            overflow: auto;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            margin: 0 10px;
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .problem-container {
+                width: 90%;
+                height: 40vh;
+                margin-bottom: 20px;
+            }
+        }
+
+        .problem-title {
+            font-size: 1.4rem;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .problem-difficulty {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .difficulty-easy {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+
+        .problem-description {
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+        }
+
+        .problem-description p {
+            margin-bottom: 12px;
+        }
+
+        .problem-description ul {
+            margin-left: 20px;
+        }
+
+        .function-signature {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Fira Code', monospace;
+            margin: 20px 0;
+            border-left: 4px solid var(--accent-color);
+            color: var(--text-primary);
+        }
+
+        /* Editor Section */
+        .main-container {
+            position: relative;
+            width: 65%;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0 10px 20px 10px;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                width: 100%;
+                height: auto;
+            }
+        }
+
+        .editor-container {
+            display: flex;
+            flex-direction: column;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            height: 65%;
+            overflow: hidden;
+            position: relative;
+            backdrop-filter: blur(12px);
+        }
+
+        .editor-header {
+            padding: 10px 20px;
+            background: rgba(30, 41, 59, 0.6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .editor-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .editor-title i {
+            color: var(--accent-color);
+        }
+
+        .zoom-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .zoom-controls button {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-primary);
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .zoom-controls button:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .zoom-controls select {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .code-wrapper {
+            position: relative;
+            flex: 1;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .CodeMirror {
+            height: 100% !important;
+            font-size: 16px;
+            background: transparent !important;
+            color: #f0f0f0;
+        }
+
+        /* Adjust Dracula theme bg to match glass */
+        .cm-s-dracula.CodeMirror {
+            background-color: rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .output-container {
+            margin-top: 15px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            overflow: hidden;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(12px);
+        }
+
+        .output-header {
+            padding: 10px 20px;
+            background: rgba(30, 41, 59, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 600;
+            border-bottom: 1px solid var(--glass-border);
+            color: var(--text-primary);
+        }
+
+        .output-title i {
+            color: #2ecc71;
+            margin-right: 8px;
+        }
+
+        #output {
+            padding: 15px;
+            flex: 1;
+            overflow-y: auto;
+            font-family: 'Fira Code', monospace;
+            color: var(--text-secondary);
+        }
+
+        /* Controls in Navbar */
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Test Result Styles */
+        .user-stats {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 12px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--glass-border);
+        }
+
+        .user-stats i {
+            color: var(--accent-color);
+        }
+
+        .btn-run,
+        .btn-reset {
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-run {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-run:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-reset:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+        }
+
+        /* Override skeletons to match */
+        .skeleton-wrapper {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .skeleton-card {
+            background-image: linear-gradient(90deg,
+                    rgba(255, 255, 255, 0),
+                    rgba(255, 255, 255, 0.1),
+                    rgba(255, 255, 255, 0));
+        }
+
+        /* Test Case Results */
+        .test-case-pass {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid #10b981;
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+        }
+
+        .test-case-fail {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 3px solid #ef4444;
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+        }
+
+        /* Attempted count specific fix */
+        #skeleton-wrapperh3 {
+            border-radius: 50px;
+        }
+
+        /* Congratulations Overlay */
+        .congrats {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            /* Let clicks pass unless explicit */
+        }
+
+        .congrats>iframe {
+            pointer-events: auto;
+            border: none;
+            width: 300px;
+            height: 300px;
+        }
+    </style>
+    <style>
+        /* Navbar Override to match 3D Visualizer (Array.html) style */
+        .navbar {
+            top: 0 !important;
+            left: 0 !important;
+            transform: none !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            border-radius: 0 !important;
+            padding: 0.8rem 2rem !important;
+            background: rgba(15, 23, 42, 0.9) !important;
+            border-bottom: 1px solid var(--glass-border);
+            border-top: none !important;
+            border-left: none !important;
+            border-right: none !important;
+        }
+
+        /* Adjust main content padding since navbar is now fixed at top and possibly shorter/different */
+        .main {
+            padding-top: 80px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Background Animations -->
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar glass">
+        <a href="index.html" class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
+            <span>DSA</span>Visualizer
+        </a>
+
+        <!-- Center Program Links (Optional, kept consistent with program1.html) -->
+        <div class="nav-center">
+            <a href="array.html" class="nav-link">3D Model</a>
+            <a href="array.html" class="nav-link">Theory</a>
+            <a href="array.html" class="nav-link">Quiz</a>
+            <a href="program1.html" class="nav-link active">Program</a>
+        </div>
+
+        <!-- Controls (Run/Reset/Stats) - Moved inside Navbar for better layout or kept to right -->
+        <div class="controls" style="margin-left: auto;">
+            <div class="user-stats" title="Number of people attempted">
+                <div id="skeleton-wrapperh3" class="skeleton-wrapper">
+                    <div class="skeleton-card"></div>
+                </div>
+                <i class="fa-solid fa-globe"></i>
+                <span>Attempted:</span> <span id="attempted">...</span>
+            </div>
+
+            <button id="coderun" class="btn-run" onclick="runTestCases()">
+                <i class="fas fa-play"></i>
+                <span style="display: inline;">Run</span>
+            </button>
+            <button class="btn-reset" onclick="resetCode()">
+                <i class="fas fa-redo"></i>
+                <span style="display: inline;">Reset</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main">
+        <!-- Problem Description Panel -->
+        <div id="problem-container" class="problem-container">
+            <div class="skeleton-wrapper">
+                <div class="skeleton-card"></div>
+            </div>
+        </div>
+
+        <!-- Editor & Output Panel -->
+        <div id="main-container" class="main-container">
+
+            <div id="editor-container" class="editor-container">
+                <div id="skeleton-wrapper" class="skeleton-wrapper">
+                    <div class="skeleton-card"></div>
+                </div>
+
+                <div class="editor-header">
+                    <div class="editor-title">
+                        <i class="fas fa-code"></i>
+                        <span>solution.c</span>
+                    </div>
+
+                    <div class="zoom-controls">
+                        <select id="langtype">
+                            <!-- Options populated by JS -->
+                        </select>
+                        <button onclick="zoomIn()" title="Zoom In">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                        <button onclick="zoomOut()" title="Zoom Out">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button id="maximize">
+                            <i class="fa-solid fa-maximize"></i>
+                        </button>
+                        <button style="display: none;" id="minimize">
+                            <i class="fa-solid fa-minimize"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="code-wrapper">
+                    <textarea style="opacity: 0;" id="editor"></textarea>
+                </div>
+            </div>
+
+            <div class="output-container">
+                <div class="output-header">
+                    <div class="output-title">
+                        <i class="fas fa-terminal"></i>
+                        <span>Test Results</span>
+                    </div>
+                    <div class="test-results">
+                        <div class="test-result test-passed" id="passed-count"
+                            style="background: rgba(16, 185, 129, 0.2); color: #2ecc71; padding: 4px 12px; border-radius: 20px;">
+                            0 passed</div>
+                    </div>
+                </div>
+                <div id="output"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Congrats Overlay -->
+    <div style="display: none;" id="congrats" class="congrats">
+        <iframe src="https://lottie.host/embed/68b3c266-eede-4984-8a6e-00d2e3881f3e/h2Um33yQ9s.lottie"></iframe>
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+
+</html>

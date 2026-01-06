@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Array Theory | DSA Visualizer</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Theory Specific Styles */
+        .theory-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            padding-bottom: 4rem;
+            color: var(--text-primary);
+        }
+
+        .theory-section {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .theory-section:hover {
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .theory-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.2);
+            padding-bottom: 0.8rem;
+            display: inline-block;
+        }
+
+        .theory-subtitle {
+            font-size: 1.6rem;
+            color: #f1f5f9;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .theory-text {
+            line-height: 1.8;
+            color: #cbd5e1;
+            font-size: 1.15rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Lists */
+        .theory-list {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .theory-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.8rem;
+            color: #cbd5e1;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .theory-list li::before {
+            content: "•";
+            color: var(--accent-color);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Visuals */
+        .array-visual {
+            display: flex;
+            gap: 15px;
+            margin: 2.5rem 0;
+            overflow-x: auto;
+            padding: 1rem 0.5rem;
+            justify-content: center;
+        }
+
+        .array-box {
+            min-width: 70px;
+            height: 70px;
+            background: rgba(59, 130, 246, 0.15);
+            border: 2px solid var(--accent-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Fira Code', monospace;
+            font-weight: bold;
+            font-size: 1.4rem;
+            color: #fff;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .array-box:hover {
+            transform: translateY(-5px);
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        .array-index {
+            position: absolute;
+            bottom: -30px;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 500;
+        }
+
+        /* Tables */
+        .theory-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 2rem 0;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .theory-table th,
+        .theory-table td {
+            text-align: left;
+            padding: 1.2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .theory-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-color);
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .theory-table td {
+            color: #e2e8f0;
+            font-size: 1.05rem;
+        }
+
+        .theory-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .theory-table tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        /* Improved Code Blocks */
+        .code-container {
+            margin: 2.5rem 0;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #0f172a;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .code-header {
+            background: #1e293b;
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .code-lang {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .win-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot-red {
+            background: #ef4444;
+        }
+
+        .dot-yellow {
+            background: #eab308;
+        }
+
+        .dot-green {
+            background: #22c55e;
+        }
+
+        .code-block {
+            background: #0f172a;
+            /* Match container */
+            padding: 1.5rem 2rem;
+            /* More space */
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            margin: 0;
+            border: none;
+            border-radius: 0;
+        }
+
+        .code-block code {
+            color: #e2e8f0;
+            font-size: 1rem;
+            /* Larger font */
+            line-height: 1.8;
+            /* Better line spacing */
+            display: block;
+        }
+
+        /* Syntax Highlighting */
+        .keyword {
+            color: #c084fc;
+            font-weight: bold;
+        }
+
+        /* Purple */
+        .type {
+            color: #3b82f6;
+        }
+
+        /* Blue */
+        .func {
+            color: #facc15;
+        }
+
+        /* Yellow */
+        .string {
+            color: #4ade80;
+        }
+
+        /* Green */
+        .comment {
+            color: #64748b;
+            font-style: italic;
+        }
+
+        /* Slate */
+        .number {
+            color: #f472b6;
+        }
+
+        /* Pink */
+        .operator {
+            color: #cbd5e1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Background Animations -->
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar glass">
+        <a href="../index.html" class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
+            <span>DSA</span>Visualizer
+        </a>
+        <div class="hamburger" id="nav-toggle">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12h18M3 6h18M3 18h18" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </div>
+        <!-- Centered Tools -->
+        <div class="nav-center">
+            <a href="../array.html" class="nav-link">3D Model</a>
+            <a href="#" class="nav-link active">Theory</a>
+            <a href="../quiz1.html" class="nav-link">Quiz</a>
+            <a href="../program1.html" class="nav-link">Program</a>
+        </div>
+
+        <div class="nav-links">
+            <a href="../index.html" class="nav-link">Home</a>
+            <a href="../topics.html" class="nav-link">Topics</a>
+            <a href="#" class="nav-link">About</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="app-container" style="display: block; overflow-y: auto;">
+
+        <header class="topics-header">
+            <h1 class="hero-title" style="margin-bottom: 0.5rem;">Array Data Structure</h1>
+            <p class="theory-subtitle" style="margin-top: 0; color: #94a3b8; font-size: 1.2rem;">Detailed explanation,
+                analysis, and implementation.</p>
+        </header>
+
+        <div class="theory-container">
+
+            <!-- Section 1: Introduction -->
+            <div class="theory-section">
+                <h2 class="theory-title">What is an Array?</h2>
+                <p class="theory-text">
+                    An Array is a fundamental linear data structure that collects elements of the <strong>same data
+                        type</strong> and stores them in <strong>contiguous memory locations</strong>. This contiguous
+                    storage allows for constant-time access to any element if its index (position) is known.
+                </p>
+                <p class="theory-text">
+                    Arrays are the building blocks for more complex data structures like heaps, hash tables, and
+                    matrices. The memory address of the first element is often called the <em>base address</em>.
+                </p>
+
+                <h3 class="theory-subtitle">Visual Representation</h3>
+                <div class="array-visual">
+                    <div class="array-box">10<span class="array-index">0</span></div>
+                    <div class="array-box">20<span class="array-index">1</span></div>
+                    <div class="array-box">30<span class="array-index">2</span></div>
+                    <div class="array-box">40<span class="array-index">3</span></div>
+                    <div class="array-box">50<span class="array-index">4</span></div>
+                </div>
+                <p class="theory-text"
+                    style="font-size: 0.95rem; color: #94a3b8; text-align: center; margin-top: 1rem;">
+                    <em>Figure 1.1: An integer array of size 5 with elements 10, 20, 30, 40, 50.</em>
+                </p>
+            </div>
+
+            <!-- Section 2: Types of Arrays -->
+            <div class="theory-section">
+                <h2 class="theory-title">Types of Arrays</h2>
+                <h3 class="theory-subtitle">1. One-Dimensional Array</h3>
+                <p class="theory-text">A linear list of elements. It needs only one subscript (index) to access an
+                    element. Example: <code>arr[5]</code>.</p>
+
+                <h3 class="theory-subtitle">2. Multi-Dimensional Array</h3>
+                <p class="theory-text">Arrays of arrays. The most common is the 2D array (matrix), which is organized in
+                    rows and columns and requires two indices to access an element. Example: <code>matrix[3][3]</code>.
+                </p>
+
+                <h3 class="theory-subtitle">3. Dynamic Array</h3>
+                <p class="theory-text">Unlike standard (static) arrays which have a fixed size, dynamic arrays (like
+                    <code>ArrayList</code> in Java or <code>vector</code> in C++) can automatically resize themselves
+                    when elements are added or removed.
+                </p>
+            </div>
+
+            <!-- Section 3: Pros and Cons -->
+            <div class="theory-section">
+                <h2 class="theory-title">Advantages & Disadvantages</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <h3 class="theory-subtitle" style="color: #4ade80; margin-top: 0;">Advantages</h3>
+                        <ul class="theory-list">
+                            <li><strong>Fast Access:</strong> Elements can be accessed in O(1) time using the index.
+                            </li>
+                            <li><strong>Memory Efficiency:</strong> Less overhead compared to linked lists (no
+                                pointers).</li>
+                            <li><strong>Cache Friendliness:</strong> Contiguous memory allocation leads to better cache
+                                locality.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="theory-subtitle" style="color: #f472b6; margin-top: 0;">Disadvantages</h3>
+                        <ul class="theory-list">
+                            <li><strong>Fixed Size:</strong> Static arrays cannot change size after declaration.</li>
+                            <li><strong>Costly Insert/Delete:</strong> Inserting or deleting in the middle requires
+                                shifting elements (O(n)).</li>
+                            <li><strong>Memory Waster:</strong> If declared size is large but usage is low, memory is
+                                wasted.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Complexity -->
+            <div class="theory-section">
+                <h2 class="theory-title">Complexity Analysis</h2>
+                <p class="theory-text">Understanding the efficiency of array operations is crucial for algorithm design.
+                </p>
+                <table class="theory-table">
+                    <thead>
+                        <tr>
+                            <th>Operation</th>
+                            <th>Time (Best)</th>
+                            <th>Time (Worst)</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Access</strong></td>
+                            <td>O(1)</td>
+                            <td>O(1)</td>
+                            <td>Direct access using index formula.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Search</strong></td>
+                            <td>O(1)</td>
+                            <td>O(n)</td>
+                            <td>Linear search scans all elements. Binary search (sorted) is O(log n).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Insertion</strong></td>
+                            <td>O(1)</td>
+                            <td>O(n)</td>
+                            <td>O(n) at beginning/middle due to shifting; O(1) at end (if space exists).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Deletion</strong></td>
+                            <td>O(1)</td>
+                            <td>O(n)</td>
+                            <td>Similar to insertion, requires shifting to fill the gap.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section 5: Code Implementation -->
+            <div class="theory-section">
+                <h2 class="theory-title">Code Implementation</h2>
+                <p class="theory-text">Below are examples of basic array operations in popular programming languages.
+                </p>
+
+                <!-- C++ -->
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-controls">
+                            <div class="win-dot dot-red"></div>
+                            <div class="win-dot dot-yellow"></div>
+                            <div class="win-dot dot-green"></div>
+                        </div>
+                        <div class="code-lang">C++</div>
+                        <div style="width: 40px;"></div> <!-- Spacer -->
+                    </div>
+                    <div class="code-block">
+                        <pre><span class="keyword">#include</span> <span class="string">&lt;iostream&gt;</span>
+<span class="keyword">using</span> <span class="keyword">namespace</span> std;
+
+<span class="keyword">int</span> <span class="func">main</span>() {
+    <span class="comment">// 1. Declaration and Initialization</span>
+    <span class="keyword">int</span> arr[<span class="number">5</span>] = {<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>, <span class="number">50</span>};
+
+    <span class="comment">// 2. Updating an element (O(1))</span>
+    arr[<span class="number">2</span>] = <span class="number">99</span>; <span class="comment">// Changes 30 to 99</span>
+
+    <span class="comment">// 3. Traversal (O(n))</span>
+    cout << <span class="string">"Array Elements: "</span>;
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i < <span class="number">5</span>; i++) {
+        cout << arr[i] << <span class="string">" "</span>;
+    }
+    cout << endl;
+
+    <span class="keyword">return</span> <span class="number">0</span>;
+}</pre>
+                    </div>
+                </div>
+
+                <!-- Java -->
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-controls">
+                            <div class="win-dot dot-red"></div>
+                            <div class="win-dot dot-yellow"></div>
+                            <div class="win-dot dot-green"></div>
+                        </div>
+                        <div class="code-lang">Java</div>
+                        <div style="width: 40px;"></div>
+                    </div>
+                    <div class="code-block">
+                        <pre><span class="keyword">public class</span> <span class="type">ArrayDemo</span> {
+    <span class="keyword">public static void</span> <span class="func">main</span>(<span class="type">String</span>[] args) {
+        <span class="comment">// 1. Declaration</span>
+        <span class="keyword">int</span>[] arr = {<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>, <span class="number">50</span>};
+
+        <span class="comment">// 2. Accessing Length</span>
+        <span class="type">System</span>.out.println(<span class="string">"Size: "</span> + arr.length);
+
+        <span class="comment">// 3. Traversal</span>
+        <span class="keyword">for</span> (<span class="keyword">int</span> i : arr) {
+            <span class="type">System</span>.out.print(i + <span class="string">" "</span>);
+        }
+    }
+}</pre>
+                    </div>
+                </div>
+
+                <!-- Python -->
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-controls">
+                            <div class="win-dot dot-red"></div>
+                            <div class="win-dot dot-yellow"></div>
+                            <div class="win-dot dot-green"></div>
+                        </div>
+                        <div class="code-lang">Python</div>
+                        <div style="width: 40px;"></div>
+                    </div>
+                    <div class="code-block">
+                        <pre><span class="comment"># 1. Python Lists serve as arrays</span>
+arr = [<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>, <span class="number">50</span>]
+
+<span class="comment"># 2. Appending (Dynamic resizing)</span>
+arr.append(<span class="number">60</span>)
+
+<span class="comment"># 3. Traversal</span>
+<span class="keyword">for</span> item <span class="keyword">in</span> arr:
+    <span class="func">print</span>(item, end=<span class="string">" "</span>)</pre>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Section 6: Applications -->
+            <div class="theory-section">
+                <h2 class="theory-title">Applications</h2>
+                <ul class="theory-list">
+                    <li>Used to implement other data structures like Stacks, Queues, Heaps, and Hash Tables.</li>
+                    <li>Matrices and image processing (2D arrays of pixels).</li>
+                    <li>CPU scheduling/Management in Operating Systems.</li>
+                    <li>Lookup tables in dynamic programming.</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Mobile Toggle Logic
+        const navToggle = document.getElementById('nav-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        if (navToggle && navLinks) {
+            navToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                navToggle.classList.toggle('active');
+            });
+        }
+    </script>
+</body>
+
+</html>

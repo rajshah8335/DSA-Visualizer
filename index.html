@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA Visualizer | Master Algorithms</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Fira Code for Editor -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Background Animations -->
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar glass">
+        <a href="#" class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
+            <span>DSA</span>Visualizer
+        </a>
+        <div class="hamburger" id="nav-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link active">Home</a>
+            <a href="topics.html" target="_blank" class="nav-link">Topics</a>
+            
+
+            <!-- Learn Dropdown (Hidden initially) -->
+            <div class="nav-item dropdown" id="learn-nav-item" style="display: none; opacity: 0;">
+                <a href="#" class="nav-link">Learn <span class="arrow" style="font-size: 0.8rem;">▼</span></a>
+                <div class="dropdown-menu glass">
+                    <a href="#" class="dropdown-item">3D model</a>
+                    <a href="#" class="dropdown-item">Theory</a>
+                    <a href="#" class="dropdown-item">Quiz</a>
+                    <a href="#" class="dropdown-item">Program</a>
+                </div>
+            </div>
+
+            <a href="#" class="nav-link">About</a>
+            <button id="logout" class="nav-link" style="background: none; border: none;padding: 0;margin: 0; display: none;"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="app-container">
+
+        <!-- Landing Page Section -->
+        <section class="landing-section">
+            <h1 class="hero-title">Visualize Data Structures<br>Like Never Before</h1>
+            <p class="hero-subtitle">Interactive 3D visualizations, comprehensive theory, and real-time coding practice
+                for 6 major DSA topics. <br>Sign in to track you progress.</p>
+            <button id="get-started-btn" class="cta-button">Start Visualizing</button>
+            <button id="signin" style="margin-top: 20px; display: none;" class="cta-button">Sign In</button>
+        </section>
+
+        <!-- Visualizer Layout Section (Initially Hidden) -->
+        <section class="visualizer-container">
+
+            <!-- 3D Model Area (Placeholder for User's Code) -->
+            <div class="model-viewer">
+                <div id="three-canvas-placeholder" class="glass">
+                    <!-- USER: Inject your 3D Canvas Here -->
+                    <div style="text-align: center;">
+                        <h3>3D Model Container</h3>
+                        <p>ID: #three-canvas-placeholder</p>
+                        <p style="font-size: 0.9rem; margin-top: 10px; color: var(--accent-color);">Inject your Three.js
+                            canvas here</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar removed as per request -->
+        </section>
+
+    </div>
+
+    <script src="js/main.js"></script>
+    <script type="module" src="js/index.js"></script>
+</body>
+
+</html>

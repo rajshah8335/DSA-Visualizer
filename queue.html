@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue | DSA Visualizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: white;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        /* --- Navbar & Modal Styles (Global) --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.compact {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #3b82f6;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: #3b82f6;
+        }
+
+        /* Dropdown */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: #0f172a;
+            min-width: 180px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 0.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 200;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            background: #1e293b;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: scale(0.95);
+            transition: transform 0.3s;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal.active-modal {
+            display: block;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f8fafc;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .close-modal:hover {
+            color: #fff;
+        }
+
+        .modal-content {
+            padding: 1.5rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        pre {
+            background: #0f172a;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #a78bfa;
+            margin-top: 1rem;
+        }
+
+        /* --- 3D Visualization Specific Styles (Scoped) --- */
+        #visualization-wrapper {
+            position: relative;
+        }
+
+        #canvas-container {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background-color: #0f172a;
+            cursor: move;
+        }
+
+        /* Queue UI Panel - Adapted for Wrapper */
+        .ui-panel {
+            position: absolute;
+            top: 40px;
+            left: 20px;
+            background: rgba(15, 23, 42, 0.65);
+            padding: 24px;
+            border-radius: 16px;
+            color: #e2e8f0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            width: 320px;
+            z-index: 10;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            max-height: calc(100% - 60px);
+            overflow-y: auto;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .ui-panel::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .ui-panel::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .ui-panel::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 4px;
+        }
+
+        /* Custom UI Elements from Request */
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+            color: #94a3b8;
+        }
+
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .btn-glass.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            color: #60a5fa;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
+        }
+
+        .action-btn {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.1s;
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+
+        .ai-output-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-left: 3px solid #8b5cf6;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.5;
+            color: #cbd5e1;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-glass {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 0.4rem 0.5rem;
+            font-size: 0.85rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .input-glass:focus {
+            border-color: #8b5cf6;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .toggle-btn {
+            position: absolute;
+            top: 40px;
+            left: 20px;
+            z-index: 20;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            color: #94a3b8;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+        }
+
+        .hidden-panel {
+            opacity: 0;
+            transform: translateX(-20px);
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .controls-container {
+                width: 90% !important;
+                left: 5% !important;
+                top: 60px !important;
+                max-height: 45vh !important;
+                padding: 15px !important;
+            }
+
+            .navbar {
+                flex-wrap: wrap;
+                padding: 0.5rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="text-white h-screen w-screen relative select-none">
+
+    <!-- Compact Navbar -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <i data-lucide="zap" class="w-6 h-6 text-blue-500"></i>
+            <span>DSA</span>Visualizer
+        </a>
+        <div class="hamburger" id="nav-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <!-- Centered Tools -->
+        <div class="nav-center">
+            <a href="#" onclick="closeModals(); return false;" class="nav-link">3D Model</a>
+            <a href="theory/theory4.html" onclick="openModal('')" class="nav-link">Theory</a>
+            <a href="quiz4.html" class="nav-link">Quiz</a>
+            <a href="programs.html?filter=queue" class="nav-link">Program</a>
+        </div>
+
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="topics.html" class="nav-link">Topics</a>
+            <a href="#" class="nav-link">About</a>
+        </div>
+    </nav>
+
+    <!-- Modals -->
+    <div id="modal-overlay" class="modal-overlay" onclick="if(event.target === this) closeModals()">
+        <!-- Theory -->
+        <div id="modal-theory" class="modal">
+            <div class="modal-header">
+                <h2>Queue Theory</h2><button class="close-modal" onclick="closeModals()">×</button>
+            </div>
+            <div class="modal-content">
+                <p>A Queue is a linear data structure that follows the <strong>FIFO (First In First Out)</strong>
+                    principle. Elements are added at the rear and removed from the front.</p>
+                <h3 class="text-white font-bold mt-4">Types:</h3>
+                <ul class="list-disc pl-5 mt-2 space-y-1">
+                    <li><strong>Simple Queue:</strong> Linear insertion and deletion.</li>
+                    <li><strong>Circular Queue:</strong> The last position stays connected to the first.</li>
+                    <li><strong>Priority Queue:</strong> Elements are served based on priority.</li>
+                </ul>
+            </div>
+        </div>
+        <!-- Quiz -->
+        <div id="modal-quiz" class="modal">
+            <div class="modal-header">
+                <h2>Queue Quiz</h2><button class="close-modal" onclick="closeModals()">×</button>
+            </div>
+            <div class="modal-content">
+                <p class="font-semibold mb-4">Q1: What principle does a Queue follow?</p>
+                <button
+                    class="w-full text-left p-3 rounded bg-slate-800 hover:bg-green-500/30 transition border border-green-500/50 mb-2">A.
+                    FIFO (Correct)</button>
+                <button
+                    class="w-full text-left p-3 rounded bg-slate-800 hover:bg-blue-600/30 transition border border-slate-700">B.
+                    LIFO</button>
+            </div>
+        </div>
+        <!-- Program -->
+        <div id="modal-program" class="modal">
+            <div class="modal-header">
+                <h2>C++ Implementation</h2><button class="close-modal" onclick="closeModals()">×</button>
+            </div>
+            <div class="modal-content">
+                <pre>
+#include &lt;queue&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    queue&lt;int&gt; q;
+    q.push(10);
+    q.push(20);
+    cout << q.front(); // 10
+    q.pop();
+    return 0;
+}</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Wrapper -->
+    <div id="visualization-wrapper"
+        class="relative w-full h-[calc(100vh-6rem)] mt-24 border-t border-slate-700/50 shadow-2xl overflow-hidden">
+
+        <div id="canvas-container"></div>
+
+        <button id="show-btn" class="toggle-btn hidden" onclick="toggleUI()" title="Show Controls">
+            <i data-lucide="settings-2" class="w-5 h-5 text-white"></i>
+        </button>
+
+        <div class="ui-panel" id="main-panel">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h1 class="text-xl font-bold text-white mb-1">Queue Viz</h1>
+                    <p class="text-xs text-slate-400">Interactive DSA Simulation</p>
+                </div>
+                <div class="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)] animate-pulse">
+                </div>
+                <!-- Added Hide Button -->
+                <button onclick="toggleUI()" class="ml-auto text-slate-400 hover:text-white transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Controls -->
+            <div class="mb-6 space-y-4">
+                <div>
+                    <label
+                        class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Configuration</label>
+                    <div class="flex gap-2 mb-2">
+                        <button id="btn-simple"
+                            class="btn-glass active flex-1 py-2 px-3 rounded-lg text-xs font-semibold"
+                            onclick="app.setMode('simple')">Simple</button>
+                        <button id="btn-circular" class="btn-glass flex-1 py-2 px-3 rounded-lg text-xs font-semibold"
+                            onclick="app.setMode('circular')">Circular</button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-slate-400">Size:</span>
+                        <input type="number" id="queue-size" class="input-glass w-16 text-center" value="8" min="3"
+                            max="20">
+                        <button onclick="app.updateSize()"
+                            class="btn-glass px-2 py-1 rounded text-[10px] hover:bg-white/10">Apply</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label
+                        class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Operations</label>
+                    <div class="mb-2">
+                        <input type="number" id="enqueue-val"
+                            class="input-glass w-full text-center placeholder-slate-500" placeholder="Value (Optional)">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="app.enqueue()"
+                            class="action-btn bg-gradient-to-br from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white py-3 px-4 rounded-xl shadow-lg shadow-indigo-900/30 text-xs font-bold uppercase tracking-wide flex flex-col items-center justify-center gap-1">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1 opacity-80"></i> Enqueue
+                        </button>
+                        <button onclick="app.dequeue()"
+                            class="action-btn bg-gradient-to-br from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 text-slate-200 py-3 px-4 rounded-xl shadow-lg text-xs font-bold uppercase tracking-wide flex flex-col items-center justify-center gap-1 border border-slate-600/50">
+                            <i data-lucide="minus" class="w-4 h-4 mb-1 opacity-80"></i> Dequeue
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="bg-slate-900/40 rounded-xl border border-slate-700/50 p-4 mb-6 backdrop-blur-sm">
+                <div class="flex justify-between items-center border-b border-slate-700/50 pb-3 mb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.5)]"></div>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Front Index</span>
+                    </div>
+                    <span id="val-front" class="font-mono text-sm text-cyan-400 font-bold">-1</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.5)]"></div>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rear Index</span>
+                    </div>
+                    <span id="val-rear" class="font-mono text-sm text-rose-400 font-bold">-1</span>
+                </div>
+            </div>
+
+            <!-- AI Section -->
+            <div class="border-t border-white/5 pt-3">
+                <div class="flex items-center justify-between cursor-pointer group select-none"
+                    onclick="toggleAiPanel()">
+                    <label
+                        class="block text-[9px] font-bold text-violet-400 uppercase tracking-widest flex items-center gap-1.5 cursor-pointer">
+                        <span
+                            class="w-3.5 h-3.5 flex items-center justify-center bg-violet-500/10 rounded border border-violet-500/20 text-violet-400 text-[10px]">✨</span>
+                        Smart Assistant
+                    </label>
+                    <div class="text-slate-500 group-hover:text-violet-400 transition-colors p-1">
+                        <i data-lucide="chevron-down" id="ai-toggle-icon"
+                            class="w-3 h-3 transition-transform duration-300"></i>
+                    </div>
+                </div>
+
+                <div id="ai-panel-content" class="transition-all duration-300 ease-in-out overflow-hidden origin-top"
+                    style="max-height: 0px; opacity: 0; margin-top: 0;">
+                    <div class="relative mb-2 mt-2">
+                        <textarea id="ai-prompt" rows="1"
+                            class="w-full bg-slate-900/60 border border-slate-700 rounded-lg py-1.5 px-2.5 text-[10px] text-slate-300 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/50 transition-all resize-none placeholder-slate-600"
+                            placeholder="Type command..."></textarea>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="app.processAiPrompt()"
+                            class="flex-1 bg-violet-600 hover:bg-violet-500 text-white py-1.5 rounded-lg text-[10px] font-bold shadow-lg shadow-violet-900/20 transition-colors">Simulate</button>
+                        <button onclick="app.explainState()"
+                            class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-1.5 rounded-lg text-[10px] font-bold border border-slate-700 transition-colors">Explain</button>
+                    </div>
+                    <div id="ai-output" class="ai-output-box hidden mt-2 p-2 rounded-lg text-[10px]"></div>
+                </div>
+            </div>
+            <div id="status-msg"
+                class="status-badge bg-slate-800 text-slate-400 border border-slate-700 w-full text-center py-1.5 rounded-lg mt-3 text-[10px]">
+                System Ready</div>
+        </div>
+    </div>
+
+    <script>
+        // Global Modal Logic
+        function openModal(type) {
+            const overlay = document.getElementById('modal-overlay');
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(m => m.classList.remove('active-modal'));
+            const target = document.getElementById('modal-' + type);
+            if (target) { overlay.classList.add('active'); target.classList.add('active-modal'); }
+        }
+        function closeModals() {
+            document.getElementById('modal-overlay').classList.remove('active');
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active-modal'));
+        }
+
+        function toggleUI() {
+            const panel = document.getElementById('main-panel');
+            const showBtn = document.getElementById('show-btn');
+
+            if (panel.classList.contains('hidden-panel')) {
+                panel.classList.remove('hidden-panel');
+                showBtn.classList.add('hidden');
+                showBtn.style.display = 'none';
+            } else {
+                panel.classList.add('hidden-panel');
+                showBtn.classList.remove('hidden');
+                showBtn.style.display = 'flex';
+            }
+        }
+
+        function toggleAiPanel() {
+            const content = document.getElementById('ai-panel-content');
+            const icon = document.getElementById('ai-toggle-icon');
+            if (content.style.maxHeight === '0px') {
+                content.style.maxHeight = '300px'; content.style.opacity = '1'; content.style.marginTop = '0.5rem';
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                content.style.maxHeight = '0px'; content.style.opacity = '0'; content.style.marginTop = '0';
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        const isMobile = () => window.innerWidth < 768;
+
+        class QueueApp {
+            constructor() {
+                this.scene = null; this.camera = null; this.renderer = null; this.controls = null;
+                this.animationId = null; this.isProcessingAI = false;
+                this.isAnimating = false;
+
+                this.colors = {
+                    front: '#22d3ee', rear: '#fb7185', slot: '#1e293b', slotBorder: '#475569',
+                    item: '#6366f1', itemEmissive: '#4338ca', text: '#94a3b8',
+                    highlight: '#fbbf24', success: '#10b981', error: '#ef4444'
+                };
+                this.mode = 'simple'; this.size = 8;
+                this.items = new Array(this.size).fill(null);
+                this.front = -1; this.rear = -1;
+                this.slots = []; this.frontMarker = null; this.rearMarker = null; this.group = new THREE.Group();
+
+                this.init();
+            }
+
+            init() {
+                const container = document.getElementById('canvas-container');
+                this.scene = new THREE.Scene();
+                this.scene.background = new THREE.Color(0x0f172a);
+                this.scene.fog = new THREE.FogExp2(0x0f172a, 0.035);
+
+                this.camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+                this.camera.position.set(0, 8, 14);
+                this.camera.lookAt(0, 0, 0);
+
+                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                this.renderer.setSize(container.clientWidth, container.clientHeight);
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                container.appendChild(this.renderer.domElement);
+
+                this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+                this.controls.enableDamping = true;
+                this.controls.dampingFactor = 0.05;
+
+                const ambient = new THREE.AmbientLight(0xffffff, 0.4);
+                this.scene.add(ambient);
+                const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+                dirLight.position.set(5, 10, 5);
+                dirLight.castShadow = true;
+                this.scene.add(dirLight);
+
+                const grid = new THREE.GridHelper(50, 50, 0x334155, 0x1e293b);
+                grid.position.y = -0.01;
+                this.scene.add(grid);
+                this.scene.add(this.group);
+
+                this.frontMarker = this.createPointer("FRONT", this.colors.front);
+                this.rearMarker = this.createPointer("REAR", this.colors.rear);
+                this.scene.add(this.frontMarker);
+                this.scene.add(this.rearMarker);
+
+                this.buildGrid();
+
+                this.onWindowResize = this.onWindowResize.bind(this);
+                window.addEventListener('resize', this.onWindowResize, false);
+                this.animate();
+            }
+
+            createPointer(text, colorHex) {
+                const group = new THREE.Group();
+                const canvas = document.createElement('canvas');
+                canvas.width = 256; canvas.height = 128;
+                const ctx = canvas.getContext('2d');
+                ctx.shadowColor = colorHex; ctx.shadowBlur = 20; ctx.fillStyle = colorHex;
+
+                const x = 20, y = 20, w = 216, h = 88, r = 44;
+                ctx.beginPath();
+                ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r);
+                ctx.closePath(); ctx.fill();
+
+                ctx.shadowBlur = 0; ctx.font = 'bold 50px "Inter", sans-serif'; ctx.fillStyle = '#0f172a';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, 128, 64);
+
+                const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(canvas), transparent: true }));
+                sprite.position.y = 1.3; sprite.scale.set(1.5, 0.75, 1);
+                group.add(sprite);
+                group.visible = false;
+                return group;
+            }
+
+            setMode(newMode) {
+                if (this.mode === newMode) return;
+                document.getElementById('btn-simple').className = newMode === 'simple' ? "btn-glass active flex-1 py-2 px-3 rounded-lg text-xs font-semibold" : "btn-glass flex-1 py-2 px-3 rounded-lg text-xs font-semibold";
+                document.getElementById('btn-circular').className = newMode === 'circular' ? "btn-glass active flex-1 py-2 px-3 rounded-lg text-xs font-semibold" : "btn-glass flex-1 py-2 px-3 rounded-lg text-xs font-semibold";
+                this.mode = newMode; this.reset(); this.buildGrid();
+                this.updateStatus(`Switched to ${newMode} queue mode`, 'normal');
+            }
+
+            updateSize() {
+                const input = document.getElementById('queue-size');
+                let newSize = parseInt(input.value);
+                if (isNaN(newSize) || newSize < 3) newSize = 3; if (newSize > 20) newSize = 20;
+                input.value = newSize;
+                if (this.size !== newSize) { this.size = newSize; this.reset(); this.buildGrid(); }
+                this.updateStatus(`Queue size set to ${newSize}`, 'normal');
+            }
+
+            reset() {
+                if (this.isAnimating) return;
+
+                this.items.forEach(i => {
+                    if (i) {
+                        this.group.remove(i);
+                        if (i.geometry) i.geometry.dispose();
+                        if (i.material) i.material.dispose();
+                    }
+                });
+                this.items = new Array(this.size).fill(null);
+                this.front = -1; this.rear = -1;
+                this.updateMarkers(); this.updateUI();
+            }
+
+            buildGrid() {
+                this.slots.forEach(s => {
+                    this.group.remove(s);
+                    if (s.geometry) s.geometry.dispose();
+                    if (s.material) s.material.dispose();
+                });
+                this.slots = [];
+                const mobile = false;
+
+                if (this.mode === 'simple') {
+                    const startX = -((this.size * 1.2) / 2) + 0.6;
+                    for (let i = 0; i < this.size; i++) {
+                        const slot = this.createSlot(i);
+                        slot.position.set(startX + i * 1.2, 0, 0);
+                        const sprite = slot.children.find(c => c.type === 'Sprite');
+                        if (sprite) sprite.position.set(0, 0.15, 0.6);
+                        this.group.add(slot); this.slots.push(slot);
+                    }
+                } else {
+                    const radius = Math.max(mobile ? 2.0 : 2.5, (this.size * 1.2) / (2 * Math.PI));
+                    for (let i = 0; i < this.size; i++) {
+                        const angle = (i / this.size) * Math.PI * 2;
+                        const slot = this.createSlot(i);
+                        slot.position.set(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
+                        slot.lookAt(0, 0, 0);
+                        const sprite = slot.children.find(c => c.type === 'Sprite');
+                        if (sprite) sprite.position.set(0, 0.15, -0.6);
+                        this.group.add(slot); this.slots.push(slot);
+                    }
+                }
+                this.updateMarkers();
+            }
+
+            createSlot(index) {
+                const wrapper = new THREE.Group();
+                const floor = new THREE.Mesh(new THREE.BoxGeometry(1, 0.05, 1), new THREE.MeshStandardMaterial({ color: this.colors.slot }));
+                floor.position.y = -0.025; floor.receiveShadow = true; wrapper.add(floor);
+
+                const edges = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(1, 1)), new THREE.LineBasicMaterial({ color: this.colors.slotBorder, opacity: 0.5, transparent: true }));
+                edges.rotation.x = -Math.PI / 2; edges.position.y = 0.01; wrapper.add(edges);
+
+                const canvas = document.createElement('canvas'); canvas.width = 128; canvas.height = 128;
+                const ctx = canvas.getContext('2d');
+                ctx.font = 'bold 80px "JetBrains Mono", monospace'; ctx.fillStyle = '#94a3b8'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(index.toString(), 64, 64);
+
+                const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(canvas) }));
+                sprite.position.set(0, 0.5, 0); sprite.scale.set(0.6, 0.6, 0.6); wrapper.add(sprite);
+                return wrapper;
+            }
+
+            async enqueue(value = null) {
+                if (this.isAnimating) return;
+                this.isAnimating = true;
+
+                const input = document.getElementById('enqueue-val');
+                let val = value !== null ? value : (input.value !== '' ? parseInt(input.value) : null);
+                input.value = '';
+
+                if (this.mode === 'simple') {
+                    if (this.rear === this.size - 1) {
+                        this.updateStatus('Queue Overflow', 'error');
+                        this.isAnimating = false;
+                        return;
+                    }
+                    if (this.front === -1) this.front = 0;
+                    this.rear++;
+                } else {
+                    if ((this.rear + 1) % this.size === this.front) {
+                        this.updateStatus('Buffer Full', 'error');
+                        this.isAnimating = false;
+                        return;
+                    }
+                    if (this.front === -1) this.front = 0;
+                    this.rear = (this.rear + 1) % this.size;
+                }
+
+                await this.addItemWithAnimation(this.rear, val);
+                this.updateMarkers();
+                this.updateUI();
+                this.updateStatus(`Enqueued ${val !== null ? val : 'random'} value`, 'success');
+                this.isAnimating = false;
+            }
+
+            async dequeue() {
+                if (this.isAnimating) return;
+                this.isAnimating = true;
+
+                if (this.front === -1) {
+                    this.updateStatus('Queue Empty', 'error');
+                    this.isAnimating = false;
+                    return;
+                }
+
+                await this.removeItemWithAnimation(this.front);
+
+                if (this.mode === 'simple') {
+                    if (this.front === this.rear) { this.front = -1; this.rear = -1; }
+                    else { this.front++; }
+                } else {
+                    if (this.front === this.rear) { this.front = -1; this.rear = -1; }
+                    else { this.front = (this.front + 1) % this.size; }
+                }
+                this.updateMarkers();
+                this.updateUI();
+                this.updateStatus(`Dequeued front element`, 'normal');
+                this.isAnimating = false;
+            }
+
+            async addItemWithAnimation(index, val) {
+                return new Promise(resolve => {
+                    const value = val !== null ? val : Math.floor(Math.random() * 99) + 1;
+                    const block = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.7, 0.25, 0.7),
+                        new THREE.MeshPhongMaterial({
+                            color: 0x1e3a8a,
+                            emissive: 0x1e40af,
+                            emissiveIntensity: 0.5,
+                            transparent: true,
+                            opacity: 0.95
+                        })
+                    );
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 128; canvas.height = 128;
+                    const ctx = canvas.getContext('2d');
+                    ctx.font = 'bold 80px "JetBrains Mono", monospace';
+                    ctx.fillStyle = '#fff';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(value.toString(), 64, 64);
+
+                    const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+                        map: new THREE.CanvasTexture(canvas)
+                    }));
+                    sprite.position.y = 0.35;
+                    sprite.scale.set(0.6, 0.6, 0.6);
+                    block.add(sprite);
+
+                    const slot = this.slots[index];
+                    block.position.copy(slot.position);
+                    block.rotation.copy(slot.rotation);
+                    block.position.y = 5;
+
+                    this.group.add(block);
+                    this.items[index] = block;
+
+                    // Animate drop
+                    let targetY = 0.15, vel = 0;
+                    const animateDrop = () => {
+                        vel += 0.03;
+                        block.position.y -= vel;
+                        if (block.position.y <= targetY) {
+                            block.position.y = targetY;
+                            resolve();
+                            return;
+                        }
+                        requestAnimationFrame(animateDrop);
+                    };
+                    animateDrop();
+                });
+            }
+
+            async removeItemWithAnimation(index) {
+                return new Promise(resolve => {
+                    const item = this.items[index];
+                    if (item) {
+                        let lift = 0.05;
+                        const animateRemove = () => {
+                            item.position.y += lift;
+                            lift += 0.01;
+                            item.scale.multiplyScalar(0.9);
+                            if (item.scale.x > 0.01) {
+                                requestAnimationFrame(animateRemove);
+                            } else {
+                                this.group.remove(item);
+                                item.geometry.dispose();
+                                item.material.dispose();
+                                this.items[index] = null;
+                                resolve();
+                            }
+                        };
+                        animateRemove();
+                    } else {
+                        resolve();
+                    }
+                });
+            }
+
+            updateMarkers() {
+                if (this.front === -1) {
+                    this.frontMarker.visible = false;
+                    this.rearMarker.visible = false;
+                    return;
+                }
+                this.frontMarker.visible = true;
+                this.rearMarker.visible = true;
+
+                const fTarget = this.slots[this.front].position.clone();
+                fTarget.y = 0;
+                if (this.front === this.rear) fTarget.x -= 0.35;
+                this.frontMarker.userData.target = fTarget;
+
+                const rTarget = this.slots[this.rear].position.clone();
+                rTarget.y = 0;
+                if (this.front === this.rear) rTarget.x += 0.35;
+                this.rearMarker.userData.target = rTarget;
+            }
+
+            updateUI() {
+                document.getElementById('val-front').innerText = this.front === -1 ? 'NULL' : this.front;
+                document.getElementById('val-rear').innerText = this.rear === -1 ? 'NULL' : this.rear;
+            }
+
+            updateStatus(msg, type) {
+                const statusEl = document.getElementById('status-msg');
+                statusEl.innerText = msg;
+                statusEl.className = `status-badge w-full text-center py-2 rounded-lg mt-4 border ${type === 'error' ? 'text-rose-400 border-rose-500/50 bg-rose-500/10' :
+                        type === 'success' ? 'text-emerald-400 border-emerald-500/50 bg-emerald-500/10' :
+                            'text-slate-400 border-slate-700 bg-slate-800/50'
+                    }`;
+            }
+
+            // --- AI INTEGRATION (Similar to array.html) ---
+            async callGeminiAPI(userPrompt) {
+                const stateData = {
+                    mode: this.mode,
+                    size: this.size,
+                    front: this.front,
+                    rear: this.rear,
+                    items: this.items.map(item => item ? 'filled' : 'empty'),
+                    isFull: this.mode === 'simple' ?
+                        (this.rear === this.size - 1) :
+                        ((this.rear + 1) % this.size === this.front),
+                    isEmpty: this.front === -1
+                };
+
+                const systemPrompt = `You are an AI assistant for a 3D Queue Visualizer. Analyze the user request and return a JSON response with:
+1. Explanation of what will happen
+2. List of commands to execute
+
+Current State:
+- Mode: ${stateData.mode}
+- Size: ${stateData.size}
+- Front Index: ${stateData.front}
+- Rear Index: ${stateData.rear}
+- Empty: ${stateData.isEmpty}
+- Full: ${stateData.isFull}
+- Items: ${JSON.stringify(stateData.items)}
+
+Available Commands:
+- enqueue(value): Enqueue a value (if not full)
+- dequeue(): Dequeue front element (if not empty)
+- reset(): Reset queue to empty state
+- setMode(mode): Set mode to 'simple' or 'circular'
+- setSize(size): Change queue size (3-20)
+- fill(count): Fill queue with random values
+
+IMPORTANT: Return ONLY JSON in this format:
+{
+    "explanation": "Brief explanation here",
+    "commands": [
+        {"cmd": "commandName", "args": [arg1, arg2, ...]}
+    ]
+}`;
+
+                try {
+                    const response = await fetch("http://localhost:5000/api/gemini", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            userPrompt,
+                            systemPrompt
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("Backend not available - using fallback");
+                    }
+
+                    const data = await response.json();
+                    console.log("Backend response:", data);
+
+                    let parsedData;
+                    if (typeof data === 'string') {
+                        parsedData = JSON.parse(data);
+                    } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                        const text = data.candidates[0].content.parts[0].text;
+                        parsedData = JSON.parse(text);
+                    } else {
+                        parsedData = data;
+                    }
+
+                    return parsedData;
+
+                } catch (error) {
+                    console.log("Using fallback AI response:", error);
+                    return this.getFallbackResponse(userPrompt, stateData);
+                }
+            }
+
+            getFallbackResponse(userPrompt, stateData) {
+                const prompt = userPrompt.toLowerCase();
+
+                if (prompt.includes('enqueue') || prompt.includes('add') || prompt.includes('push')) {
+                    const value = this.extractNumber(prompt) || Math.floor(Math.random() * 99) + 1;
+                    return {
+                        explanation: `**Enqueue Operation**: Adding value ${value} to the ${stateData.mode} queue at rear position.`,
+                        commands: [{ "cmd": "enqueue", "args": [value] }]
+                    };
+                } else if (prompt.includes('dequeue') || prompt.includes('remove') || prompt.includes('pop')) {
+                    return {
+                        explanation: `**Dequeue Operation**: Removing front element from the ${stateData.mode} queue.`,
+                        commands: [{ "cmd": "dequeue", "args": [] }]
+                    };
+                } else if (prompt.includes('reset') || prompt.includes('clear') || prompt.includes('empty')) {
+                    return {
+                        explanation: `**Reset Operation**: Clearing all elements from the queue.`,
+                        commands: [{ "cmd": "reset", "args": [] }]
+                    };
+                } else if (prompt.includes('circular')) {
+                    return {
+                        explanation: `**Mode Change**: Switching to circular queue mode.`,
+                        commands: [{ "cmd": "setMode", "args": ["circular"] }]
+                    };
+                } else if (prompt.includes('simple') || prompt.includes('linear')) {
+                    return {
+                        explanation: `**Mode Change**: Switching to simple linear queue mode.`,
+                        commands: [{ "cmd": "setMode", "args": ["simple"] }]
+                    };
+                } else if (prompt.includes('size') || prompt.includes('resize')) {
+                    const size = this.extractNumber(prompt) || 8;
+                    const validSize = Math.min(Math.max(size, 3), 20);
+                    return {
+                        explanation: `**Resize Operation**: Changing queue size to ${validSize}.`,
+                        commands: [{ "cmd": "setSize", "args": [validSize] }]
+                    };
+                } else if (prompt.includes('fill') || prompt.includes('random')) {
+                    const count = this.extractNumber(prompt) || Math.min(5, stateData.size);
+                    const commands = [];
+                    for (let i = 0; i < count; i++) {
+                        commands.push({ "cmd": "enqueue", "args": [null] });
+                    }
+                    return {
+                        explanation: `**Fill Operation**: Adding ${count} random values to the queue.`,
+                        commands: commands
+                    };
+                }
+
+                // Default explanation for state
+                return {
+                    explanation: `**Current State**: ${stateData.mode} queue, Size: ${stateData.size}, Front: ${stateData.front}, Rear: ${stateData.rear}, Empty: ${stateData.isEmpty}, Full: ${stateData.isFull}.`,
+                    commands: []
+                };
+            }
+
+            extractNumber(text) {
+                const match = text.match(/\d+/);
+                return match ? parseInt(match[0]) : null;
+            }
+
+            async executeAICommands(commandList) {
+                if (!commandList || !Array.isArray(commandList)) {
+                    console.error("Invalid command list:", commandList);
+                    return;
+                }
+
+                for (const item of commandList) {
+                    const { cmd, args } = item;
+                    console.log("Executing:", cmd, "with args:", args);
+
+                    // Wait for animation to complete
+                    while (this.isAnimating) {
+                        await new Promise(r => setTimeout(r, 100));
+                    }
+
+                    try {
+                        switch (cmd) {
+                            case 'enqueue':
+                                await this.enqueue(args[0]);
+                                break;
+                            case 'dequeue':
+                                await this.dequeue();
+                                break;
+                            case 'reset':
+                                this.reset();
+                                break;
+                            case 'setMode':
+                                this.setMode(args[0]);
+                                break;
+                            case 'setSize':
+                                document.getElementById('queue-size').value = args[0];
+                                this.updateSize();
+                                break;
+                            case 'fill':
+                                for (let i = 0; i < args[0]; i++) {
+                                    await this.enqueue(null);
+                                }
+                                break;
+                            default:
+                                console.warn("Unknown command:", cmd);
+                        }
+                    } catch (error) {
+                        console.error("Error executing command:", cmd, error);
+                        this.updateStatus(`Error executing: ${cmd}`, 'error');
+                    }
+
+                    await new Promise(r => setTimeout(r, 500));
+                }
+            }
+
+            showAIOutput(text, isThinking = false) {
+                const outputEl = document.getElementById('ai-output');
+                const formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                outputEl.innerHTML = formatted;
+
+                if (isThinking) {
+                    outputEl.className = 'ai-output-box mt-2 p-2 rounded-lg text-[10px] bg-purple-900/30 border-purple-500/50';
+                } else {
+                    outputEl.className = 'ai-output-box mt-2 p-2 rounded-lg text-[10px] bg-slate-900/60 border-violet-500/50';
+                }
+
+                outputEl.classList.remove('hidden');
+
+                // Auto-scroll
+                outputEl.scrollTop = outputEl.scrollHeight;
+            }
+
+            hideAIOutput() {
+                document.getElementById('ai-output').classList.add('hidden');
+            }
+
+            async processAiPrompt() {
+                const prompt = document.getElementById('ai-prompt').value.trim();
+                if (!prompt) {
+                    this.updateStatus("Please enter an AI command", 'error');
+                    return;
+                }
+
+                // Clear input
+                document.getElementById('ai-prompt').value = '';
+
+                this.showAIOutput("Processing your request...", true);
+                this.updateStatus("AI processing...", 'normal');
+
+                const aiResult = await this.callGeminiAPI(prompt);
+
+                if (!aiResult) {
+                    this.updateStatus("AI response error", 'error');
+                    this.showAIOutput("Failed to get AI response. Please try again.");
+                    return;
+                }
+
+                this.showAIOutput(aiResult.explanation || "No explanation provided");
+                this.updateStatus("AI response received", 'success');
+
+                if (aiResult.commands && aiResult.commands.length > 0) {
+                    this.updateStatus("Executing AI commands...", 'normal');
+                    await this.executeAICommands(aiResult.commands);
+                    this.updateStatus("AI simulation complete", 'success');
+                }
+            }
+
+            async explainState() {
+                const prompt = "Explain the current state of the queue data structure.";
+                this.showAIOutput("Analyzing current queue state...", true);
+
+                const aiResult = await this.callGeminiAPI(prompt);
+
+                if (aiResult && aiResult.explanation) {
+                    this.showAIOutput(aiResult.explanation);
+                    this.updateStatus("State analysis complete", 'success');
+                } else {
+                    this.showAIOutput("Unable to analyze state. Current queue info: " +
+                        `Mode: ${this.mode}, Size: ${this.size}, Front: ${this.front}, Rear: ${this.rear}, ` +
+                        `Empty: ${this.front === -1}, Full: ${this.mode === 'simple' ? (this.rear === this.size - 1) : ((this.rear + 1) % this.size === this.front)}`);
+                }
+            }
+
+            onWindowResize() {
+                const container = document.getElementById('canvas-container');
+                if (container && this.renderer) {
+                    this.camera.aspect = container.clientWidth / container.clientHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(container.clientWidth, container.clientHeight);
+                    this.buildGrid();
+                }
+            }
+
+            animate() {
+                this.animationId = requestAnimationFrame(() => this.animate());
+                this.controls.update();
+
+                // Smooth marker movement
+                [this.frontMarker, this.rearMarker].forEach(m => {
+                    if (m.visible && m.userData.target) {
+                        m.position.lerp(m.userData.target, 0.15);
+                    }
+                });
+
+                this.renderer.render(this.scene, this.camera);
+            }
+
+            dispose() {
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                }
+                window.removeEventListener('resize', this.onWindowResize);
+            }
+        }
+
+        // Initialize the app
+        let app;
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.app) {
+                window.app.dispose();
+                window.app = null;
+            }
+            app = new QueueApp();
+            window.app = app;
+            lucide.createIcons();
+
+            // Mobile Nav Toggle
+            const navToggle = document.getElementById('nav-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            if (navToggle && navLinks) {
+                navToggle.addEventListener('click', () => {
+                    navLinks.classList.toggle('active');
+                    navToggle.classList.toggle('active');
+                });
+            }
+
+            // Navbar Attachment Animation
+            setTimeout(() => {
+                const navbar = document.querySelector('.navbar');
+                if (navbar) navbar.classList.add('compact');
+            }, 100);
+
+            // AI prompt enter key support
+            document.getElementById('ai-prompt').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    app.processAiPrompt();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

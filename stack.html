@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stack | DSA Visualizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: white;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        /* --- Navbar & Modal Styles (Global) --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.compact {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #3b82f6;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: #3b82f6;
+        }
+
+        /* Dropdown */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: #0f172a;
+            min-width: 180px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 0.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 200;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            background: #1e293b;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: scale(0.95);
+            transition: transform 0.3s;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal.active-modal {
+            display: block;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f8fafc;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .close-modal:hover {
+            color: #fff;
+        }
+
+        .modal-content {
+            padding: 1.5rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        pre {
+            background: #0f172a;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #a78bfa;
+            margin-top: 1rem;
+        }
+
+        /* --- 3D Visualization Specific Styles (Glass UI) --- */
+        #visualization-wrapper {
+            position: relative;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .controls-container {
+            pointer-events: auto;
+            position: absolute;
+            top: 40px;
+            left: 20px;
+            width: 300px;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            max-height: calc(100% - 60px);
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #60a5fa;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        button.action-btn {
+            background: rgba(59, 130, 246, 0.8);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.2);
+            font-size: 0.9rem;
+            flex-grow: 1;
+            text-align: center;
+            backdrop-filter: blur(4px);
+        }
+
+        button.action-btn:hover {
+            background: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        button.btn-pop {
+            background: rgba(239, 68, 68, 0.8);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        button.btn-pop:hover {
+            background: #ef4444;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        button.btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #cbd5e1;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        button.btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Status Panel */
+        .status-panel {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        .status-value {
+            font-weight: 600;
+            color: #f8fafc;
+            font-family: 'Fira Code', monospace;
+        }
+
+        #message-log {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-style: italic;
+            text-align: center;
+            min-height: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* 3D Overlay Elements */
+        .tutorial-hint {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            pointer-events: none;
+            font-size: 0.85rem;
+            user-select: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .controls-container {
+                width: 90% !important;
+                left: 5% !important;
+                top: 60px !important;
+                max-height: 45vh !important;
+                padding: 15px !important;
+            }
+
+            .navbar {
+                flex-wrap: wrap;
+                padding: 0.5rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="text-white h-screen w-screen relative select-none">
+
+    <!-- Compact Navbar -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <i data-lucide="zap" class="w-6 h-6 text-blue-500"></i>
+            <span>DSA</span>Visualizer
+        </a>
+        <div class="hamburger" id="nav-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <!-- Centered Tools -->
+        <div class="nav-center">
+            <a href="#" onclick="closeModals(); return false;" class="nav-link">3D Model</a>
+            <a href="theory/theory3.html" onclick="openModal('')" class="nav-link">Theory</a>
+            <a href="quiz3.html" class="nav-link">Quiz</a>
+            <a href="programs.html?filter=stack" class="nav-link">Program</a>
+        </div>
+
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="topics.html" class="nav-link">Topics</a>
+            <a href="#" class="nav-link">About</a>
+        </div>
+    </nav>
+
+    <!-- Modals -->
+    <div id="modal-overlay" class="modal-overlay" onclick="if(event.target === this) closeModals()">
+        <!-- Theory -->
+        <div id="modal-theory" class="modal">
+            <div class="modal-header">
+                <h2>Stack Theory</h2><button class="close-modal" onclick="closeModals()">×</button>
+            </div>
+            <div class="modal-content">
+                <p>A Stack is a linear data structure that follows the <strong>LIFO (Last In First Out)</strong>
+                    principle. The element inserted last is the first one to be deleted.</p>
+                <h3 class="text-white font-bold mt-4">Operations:</h3>
+                <ul class="list-disc pl-5 mt-2 space-y-1">
+                    <li><strong>Push:</strong> Add an element to the top. (O(1))</li>
+                    <li><strong>Pop:</strong> Remove the top element. (O(1))</li>
+                    <li><strong>Peek/Top:</strong> View the top element without removing. (O(1))</li>
+                </ul>
+            </div>
+        </div>
+        <!-- Quiz -->
+        <div id="modal-quiz" class="modal">
+            <div class="modal-header">
+                <h2>Stack Quiz</h2><button class="close-modal" onclick="closeModals()">×</button>
+            </div>
+            <div class="modal-content">
+                <p class="font-semibold mb-4">Q1: Which principle does a Stack follow?</p>
+                <div class="space-y-2">
+                    <button
+                        class="w-full text-left p-3 rounded bg-slate-800 hover:bg-blue-600/30 transition border border-slate-700">A.
+                        FIFO (First In First Out)</button>
+                    <button
+                        class="w-full text-left p-3 rounded bg-slate-800 hover:bg-green-500/30 transition border border-green-500/50">B.
+                        LIFO (Last In First Out) (Correct)</button>
+                    <button
+                        class="w-full text-left p-3 rounded bg-slate-800 hover:bg-blue-600/30 transition border border-slate-700">C.
+                        Random Access</button>
+                </div>
+            </div>
+        </div>
+        <!-- Program -->
+        <div id="modal-program" class="modal">
+            <div class="modal-header">
+                <h2>C++ Implementation</h2><button class="close-modal" onclick="closeModals()">×</button>
+            </div>
+            <div class="modal-content">
+                <p>Using std::stack in C++.</p>
+                <pre>
+#include &lt;stack&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    stack&lt;int&gt; s;
+    s.push(10);
+    s.push(20);
+    s.pop(); // Removes 20
+    cout << s.top(); // Prints 10
+    return 0;
+}</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Wrapper -->
+    <div id="visualization-wrapper"
+        class="relative w-full h-[calc(100vh-6rem)] mt-24 border-t border-slate-700/50 shadow-2xl overflow-hidden">
+
+        <!-- Canvas -->
+        <div id="canvas-container" class="absolute inset-0 z-0 cursor-move bg-[#0f172a]"></div>
+
+        <!-- Stack UI Overlay -->
+        <button id="show-btn" onclick="toggleUI()"
+            class="absolute top-5 left-5 bg-slate-800/80 p-2 rounded-lg border border-slate-700 text-white text-xs hidden hover:bg-slate-700 z-50">Show
+            Controls</button>
+
+        <div id="ui-layer">
+            <div class="controls-container">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="layers"
+                            class="w-5 h-5 text-blue-500"></i> Stack Ops</h2>
+                    <button onclick="toggleUI()"
+                        class="text-xs text-slate-400 hover:text-white bg-white/5 px-2 py-1 rounded border border-white/10">Hide</button>
+                </div>
+
+                <div class="control-group">
+                    <input type="text" id="push-value" placeholder="Value (e.g. 42)" onkeypress="handleEnter(event)">
+                    <button class="action-btn" onclick="triggerPush()">Push</button>
+                </div>
+
+                <button class="action-btn btn-pop" onclick="triggerPop()">Pop Top</button>
+
+                <div class="control-group">
+                    <button class="action-btn btn-secondary" onclick="triggerPeek()">Peek</button>
+                    <button class="action-btn btn-secondary" onclick="triggerClear()">Clear All</button>
+                </div>
+
+                <!-- Stats -->
+                <div class="status-panel">
+                    <div class="section-title">Status</div>
+                    <div class="status-item"><span>Top Element:</span><span id="status-top"
+                            class="status-value">null</span></div>
+                    <div class="status-item"><span>Stack Size:</span><span id="status-size"
+                            class="status-value">0</span></div>
+                    <div id="message-log">Ready...</div>
+                </div>
+
+                <!-- AI Section -->
+                <div class="mt-4 pt-4 border-t border-white/10">
+                    <span class="section-title"><i data-lucide="sparkles" class="w-3 h-3"></i> AI Command</span>
+                    <textarea id="ai-prompt" placeholder="Ex: 'Push 5 random numbers'"></textarea>
+                    <div class="flex gap-2 mt-2">
+                        <button class="action-btn" onclick="runAICommand()">Simulate</button>
+                        <button class="action-btn btn-secondary" onclick="explainStack()">Explain</button>
+                    </div>
+                    <div id="ai-status" class="mt-2 text-xs text-gray-400 italic"></div>
+                </div>
+            </div>
+
+            <div class="tutorial-hint">Drag to Rotate • Scroll to Zoom • Right Click to Pan</div>
+        </div>
+    </div>
+
+    <script>
+        // --- Modal Logic ---
+        // --- Modal Logic ---
+        function openModal(type) {
+            const overlay = document.getElementById('modal-overlay');
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(m => m.classList.remove('active-modal'));
+            const target = document.getElementById('modal-' + type);
+            if (target) {
+                overlay.classList.add('active');
+                target.classList.add('active-modal');
+            }
+        }
+
+        function closeModals() {
+            document.getElementById('modal-overlay').classList.remove('active');
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active-modal'));
+        }
+
+        function toggleUI() {
+            const ui = document.querySelector('.controls-container');
+            const btn = document.getElementById('show-btn');
+            if (ui.style.display === 'none') {
+                ui.style.display = 'flex';
+                btn.classList.add('hidden');
+            } else {
+                ui.style.display = 'none';
+                btn.classList.remove('hidden');
+            }
+        }
+
+        // --- 3D Stack Logic ---
+        const CONFIG = {
+            boxSize: 2,
+            boxHeight: 1,
+            gap: 0.1,
+            colors: {
+                bg: 0x0f172a,
+                boxBody: 0x1e293b,
+                boxBorder: 0x3b82f6,
+                text: '#ffffff',
+                highlight: 0xa855f7,
+                pushColor: 0x3b82f6,
+                popColor: 0xef4444,
+                peekColor: 0x10b981
+            }
+        };
+
+        let stack = [];
+        let animations = [];
+        let scene, camera, renderer, controls;
+        let isAnimating = false;
+
+        // Initialize Three.js
+        function init() {
+            const container = document.getElementById('canvas-container');
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(CONFIG.colors.bg);
+            scene.fog = new THREE.FogExp2(CONFIG.colors.bg, 0.02);
+
+            camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(20, 20, 20);
+            camera.lookAt(0, 5, 0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
+
+            // OrbitControls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxPolarAngle = Math.PI / 2 - 0.1;
+            controls.target.set(0, 5, 0);
+
+            // Lighting
+            const ambient = new THREE.AmbientLight(0xffffff, 0.4);
+            scene.add(ambient);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+            dirLight.position.set(10, 20, 10);
+            dirLight.castShadow = true;
+            scene.add(dirLight);
+
+            // Grid Environment
+            const gridHelper = new THREE.GridHelper(300, 30, 0x4f46e5, 0x0f172a);
+            gridHelper.position.y = -0.5;
+            gridHelper.material.opacity = 0.3;
+            gridHelper.material.transparent = true;
+            scene.add(gridHelper);
+
+            // Events
+            window.addEventListener('resize', onWindowResize, false);
+
+            animate();
+
+            // Create initial demo elements
+            setTimeout(() => pushToStack(10), 500);
+            setTimeout(() => pushToStack(20), 1000);
+
+            createPlatform();
+        }
+
+        function createPlatform() {
+            // Platform Base
+            const geometry = new THREE.CylinderGeometry(6, 6.5, 1, 32);
+            const material = new THREE.MeshStandardMaterial({
+                color: 0x1e293b,
+                roughness: 0.6,
+                metalness: 0.2
+            });
+            const platform = new THREE.Mesh(geometry, material);
+            platform.position.y = -0.6;
+            platform.receiveShadow = true;
+            scene.add(platform);
+
+            // Glowing Ring
+            const ringGeo = new THREE.TorusGeometry(6.5, 0.2, 8, 50);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0x3b82f6 });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.rotation.x = Math.PI / 2;
+            ring.position.y = -0.9;
+            scene.add(ring);
+        }
+
+        function createTextTexture(text) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(0, 0, 256, 256);
+            ctx.lineWidth = 15;
+            ctx.strokeStyle = '#3b82f6';
+            ctx.strokeRect(0, 0, 256, 256);
+
+            ctx.font = 'bold 90px Inter';
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, 128, 128);
+
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        function triggerPush() {
+            if (isAnimating) return;
+
+            const input = document.getElementById('push-value');
+            const val = input.value.trim();
+            if (val === "") {
+                logMessage("Please enter a value to push", true);
+                return;
+            }
+            if (stack.length >= 12) {
+                logMessage("Stack Overflow! (Visual Limit)", true);
+                return;
+            }
+            pushToStack(val);
+            input.value = "";
+            input.focus();
+        }
+
+        function pushToStack(value, animateFromTop = true) {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const targetY = (stack.length * (CONFIG.boxHeight + CONFIG.gap)) + 0.4;
+            const geo = new THREE.BoxGeometry(CONFIG.boxSize, CONFIG.boxHeight, CONFIG.boxSize);
+            const texture = createTextTexture(value);
+            const mat = new THREE.MeshStandardMaterial({
+                map: texture,
+                roughness: 0.3,
+                metalness: 0.1
+            });
+
+            const mesh = new THREE.Mesh(geo, mat);
+
+            if (animateFromTop) {
+                // Animate from above
+                mesh.position.set(0, 20, 0);
+            } else {
+                // Instant appear at position (for batch operations)
+                mesh.position.set(0, targetY, 0);
+                mesh.scale.set(0.1, 0.1, 0.1);
+            }
+
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            scene.add(mesh);
+
+            stack.push({ value: value, mesh: mesh, targetY: targetY });
+
+            if (animateFromTop) {
+                // Animate falling into place
+                const duration = 800;
+                const startTime = Date.now();
+
+                function animatePush() {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+
+                    // Ease out function
+                    const ease = 1 - Math.pow(1 - progress, 3);
+
+                    mesh.position.y = 20 + (targetY - 20) * ease;
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animatePush);
+                    } else {
+                        mesh.position.y = targetY;
+                        isAnimating = false;
+                    }
+                }
+
+                requestAnimationFrame(animatePush);
+            } else {
+                // Scale animation
+                new TWEEN.Tween(mesh.scale)
+                    .to({ x: 1, y: 1, z: 1 }, 500)
+                    .easing(TWEEN.Easing.Elastic.Out)
+                    .onComplete(() => { isAnimating = false; })
+                    .start();
+            }
+
+            updateUI();
+            logMessage(`Pushed ${value}`);
+        }
+
+        function triggerPop() {
+            if (isAnimating) return;
+            if (stack.length === 0) {
+                logMessage("Stack Underflow!", true);
+                return;
+            }
+
+            isAnimating = true;
+            const item = stack.pop();
+            logMessage(`Popped ${item.value}`);
+
+            // Animate Pop
+            const popDuration = 600;
+            const startY = item.mesh.position.y;
+            const startTime = Date.now();
+
+            function animatePop() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / popDuration, 1);
+
+                // Fly up and fade out
+                item.mesh.position.y = startY + 15 * progress;
+                item.mesh.rotation.y += 0.1;
+                item.mesh.material.opacity = 1 - progress;
+                item.mesh.material.transparent = true;
+
+                if (progress < 1) {
+                    requestAnimationFrame(animatePop);
+                } else {
+                    scene.remove(item.mesh);
+                    if (item.mesh.geometry) item.mesh.geometry.dispose();
+                    if (item.mesh.material) {
+                        if (item.mesh.material.map) item.mesh.material.map.dispose();
+                        item.mesh.material.dispose();
+                    }
+                    updateUI();
+                    isAnimating = false;
+                }
+            }
+
+            requestAnimationFrame(animatePop);
+        }
+
+        function triggerPeek() {
+            if (stack.length === 0) {
+                logMessage("Empty Stack");
+                return;
+            }
+
+            const top = stack[stack.length - 1];
+            logMessage(`Top: ${top.value}`);
+
+            // Highlight animation
+            const originalEmissive = top.mesh.material.emissive.getHex();
+            top.mesh.material.emissive.setHex(CONFIG.colors.peekColor);
+
+            // Bounce animation
+            const originalY = top.mesh.position.y;
+            new TWEEN.Tween(top.mesh.position)
+                .to({ y: originalY + 0.5 }, 200)
+                .yoyo(true)
+                .repeat(1)
+                .onComplete(() => {
+                    top.mesh.position.y = originalY;
+                    setTimeout(() => {
+                        top.mesh.material.emissive.setHex(originalEmissive);
+                    }, 300);
+                })
+                .start();
+        }
+
+        function triggerClear() {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            // Animate removing all elements
+            if (stack.length === 0) {
+                logMessage("Stack is already empty");
+                isAnimating = false;
+                return;
+            }
+
+            logMessage("Clearing stack...");
+
+            // Animate removal of all elements
+            let removed = 0;
+
+            function removeNext() {
+                if (removed >= stack.length) {
+                    stack = [];
+                    updateUI();
+                    isAnimating = false;
+                    logMessage("Stack cleared");
+                    return;
+                }
+
+                const item = stack[stack.length - 1 - removed];
+                const startTime = Date.now();
+                const duration = 300;
+
+                function animateRemove() {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+
+                    item.mesh.scale.x = 1 - progress;
+                    item.mesh.scale.y = 1 - progress;
+                    item.mesh.scale.z = 1 - progress;
+                    item.mesh.material.opacity = 1 - progress;
+                    item.mesh.material.transparent = true;
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animateRemove);
+                    } else {
+                        scene.remove(item.mesh);
+                        if (item.mesh.geometry) item.mesh.geometry.dispose();
+                        if (item.mesh.material) {
+                            if (item.mesh.material.map) item.mesh.material.map.dispose();
+                            item.mesh.material.dispose();
+                        }
+                        removed++;
+                        setTimeout(removeNext, 100);
+                    }
+                }
+
+                requestAnimationFrame(animateRemove);
+            }
+
+            removeNext();
+        }
+
+        function updateUI() {
+            document.getElementById('status-size').innerText = stack.length;
+            document.getElementById('status-top').innerText = stack.length > 0 ? stack[stack.length - 1].value : "null";
+        }
+
+        function logMessage(msg, err = false) {
+            const el = document.getElementById('message-log');
+            el.innerText = msg;
+            el.style.color = err ? '#f87171' : '#94a3b8';
+            el.style.opacity = '1';
+
+            // Auto-fade after 3 seconds
+            setTimeout(() => {
+                el.style.opacity = '0.5';
+            }, 3000);
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') triggerPush();
+        }
+
+        // --- AI Integration ---
+        async function callGeminiAPI(userPrompt) {
+            const stackData = stack.map(item => item.value);
+
+            const systemPrompt = `You are an AI assistant for a 3D Stack Visualizer.
+Analyze the user request and return a JSON response with explanation and commands.
+
+Current Stack (LIFO - Last In First Out):
+- Stack: ${JSON.stringify(stackData)}
+- Size: ${stack.length}
+- Top: ${stack.length > 0 ? stack[stack.length - 1].value : "Empty"}
+
+Available Commands:
+- push(value): Push value onto stack
+- pop(): Remove top element
+- peek(): View top element
+- clear(): Clear all elements
+- reset(): Reset to default [10, 20]
+- fill(count): Fill with random values
+- simulate(operations): Simulate multiple operations
+
+IMPORTANT: Return ONLY JSON in this format:
+{
+    "explanation": "Brief explanation here",
+    "commands": [
+        {"cmd": "commandName", "args": [arg1, arg2, ...]}
+    ]
+}`;
+
+            try {
+                const response = await fetch("http://localhost:5000/api/gemini", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        userPrompt,
+                        systemPrompt
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Backend not available - using fallback");
+                }
+
+                const data = await response.json();
+                console.log("Backend response:", data);
+
+                let parsedData;
+                if (typeof data === 'string') {
+                    parsedData = JSON.parse(data);
+                } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                    const text = data.candidates[0].content.parts[0].text;
+                    parsedData = JSON.parse(text);
+                } else {
+                    parsedData = data;
+                }
+
+                return parsedData;
+
+            } catch (error) {
+                console.log("Using fallback AI response:", error);
+                return getFallbackResponse(userPrompt, stackData);
+            }
+        }
+
+        function getFallbackResponse(userPrompt, stackData) {
+            const prompt = userPrompt.toLowerCase();
+
+            if (prompt.includes('push') || prompt.includes('add')) {
+                const numbers = extractAllNumbers(prompt);
+                if (numbers.length > 0) {
+                    return {
+                        explanation: `**Push Operation**: Adding values ${numbers.join(', ')} to the stack (LIFO order).`,
+                        commands: numbers.map(num => ({ "cmd": "push", "args": [num.toString()] }))
+                    };
+                } else {
+                    const val = Math.floor(Math.random() * 90) + 10;
+                    return {
+                        explanation: `**Push Operation**: Adding random value ${val} to the stack.`,
+                        commands: [{ "cmd": "push", "args": [val.toString()] }]
+                    };
+                }
+            } else if (prompt.includes('pop') || prompt.includes('remove')) {
+                if (prompt.includes('all') || prompt.includes('clear')) {
+                    return {
+                        explanation: `**Clear Stack**: Removing all elements from the stack.`,
+                        commands: [{ "cmd": "clear", "args": [] }]
+                    };
+                } else {
+                    const count = extractNumber(prompt) || 1;
+                    const commands = [];
+                    for (let i = 0; i < count; i++) {
+                        commands.push({ "cmd": "pop", "args": [] });
+                    }
+                    return {
+                        explanation: `**Pop Operation**: Removing ${count} element(s) from the top of the stack.`,
+                        commands: commands
+                    };
+                }
+            } else if (prompt.includes('peek') || prompt.includes('top')) {
+                return {
+                    explanation: `**Peek Operation**: Viewing the top element without removing it.`,
+                    commands: [{ "cmd": "peek", "args": [] }]
+                };
+            } else if (prompt.includes('fill') || prompt.includes('random')) {
+                const count = extractNumber(prompt) || 5;
+                const commands = [];
+                for (let i = 0; i < count; i++) {
+                    const val = Math.floor(Math.random() * 90) + 10;
+                    commands.push({ "cmd": "push", "args": [val.toString()] });
+                }
+                return {
+                    explanation: `**Fill Stack**: Adding ${count} random values to the stack.`,
+                    commands: commands
+                };
+            } else if (prompt.includes('reset') || prompt.includes('default')) {
+                return {
+                    explanation: `**Reset**: Clearing stack and restoring default values [10, 20].`,
+                    commands: [
+                        { "cmd": "clear", "args": [] },
+                        { "cmd": "push", "args": ["10"] },
+                        { "cmd": "push", "args": ["20"] }
+                    ]
+                };
+            } else if (prompt.includes('simulate') || prompt.includes('example')) {
+                return {
+                    explanation: `**Stack Simulation**: Demonstrating stack operations - push 3 values, peek, then pop.`,
+                    commands: [
+                        { "cmd": "push", "args": ["30"] },
+                        { "cmd": "push", "args": ["40"] },
+                        { "cmd": "push", "args": ["50"] },
+                        { "cmd": "peek", "args": [] },
+                        { "cmd": "pop", "args": [] }
+                    ]
+                };
+            }
+
+            // Default explanation
+            return {
+                explanation: `**Current Stack State**: ${stack.length} elements, top is ${stack.length > 0 ? stack[stack.length - 1].value : "empty"}. Stack follows LIFO (Last In First Out) principle.`,
+                commands: []
+            };
+        }
+
+        function extractNumber(text) {
+            const match = text.match(/\d+/);
+            return match ? parseInt(match[0]) : null;
+        }
+
+        function extractAllNumbers(text) {
+            const matches = text.match(/\d+/g);
+            return matches ? matches.map(Number) : [];
+        }
+
+        async function executeAICommands(commandList) {
+            if (!commandList || !Array.isArray(commandList)) {
+                console.error("Invalid command list:", commandList);
+                return;
+            }
+
+            for (const item of commandList) {
+                const { cmd, args } = item;
+                console.log("Executing:", cmd, "with args:", args);
+
+                // Wait for animation to complete
+                while (isAnimating) {
+                    await new Promise(r => setTimeout(r, 100));
+                }
+
+                try {
+                    switch (cmd) {
+                        case 'push':
+                            if (args[0]) {
+                                await new Promise(resolve => {
+                                    pushToStack(args[0].toString(), true);
+                                    setTimeout(resolve, 800);
+                                });
+                            }
+                            break;
+                        case 'pop':
+                            triggerPop();
+                            await new Promise(resolve => setTimeout(resolve, 800));
+                            break;
+                        case 'peek':
+                            triggerPeek();
+                            await new Promise(resolve => setTimeout(resolve, 800));
+                            break;
+                        case 'clear':
+                            triggerClear();
+                            await new Promise(resolve => setTimeout(resolve, 800));
+                            break;
+                        case 'reset':
+                            triggerClear();
+                            await new Promise(resolve => setTimeout(resolve, 800));
+                            pushToStack("10", false);
+                            await new Promise(resolve => setTimeout(resolve, 500));
+                            pushToStack("20", false);
+                            await new Promise(resolve => setTimeout(resolve, 500));
+                            break;
+                        default:
+                            console.warn("Unknown command:", cmd);
+                            logMessage(`Unknown command: ${cmd}`, true);
+                    }
+                } catch (error) {
+                    console.error("Error executing command:", cmd, error);
+                    logMessage(`Error executing: ${cmd}`, true);
+                }
+
+                await new Promise(r => setTimeout(r, 300));
+            }
+        }
+
+        async function runAICommand() {
+            if (isAnimating) {
+                logMessage("Please wait for current animation to finish", true);
+                return;
+            }
+
+            const prompt = document.getElementById("ai-prompt").value;
+            if (!prompt.trim()) {
+                logMessage("Please enter an AI command", true);
+                return;
+            }
+
+            const aiStatus = document.getElementById('ai-status');
+            aiStatus.innerText = "Processing AI request...";
+            aiStatus.style.color = "#94a3b8";
+
+            const aiResult = await callGeminiAPI(prompt);
+
+            if (!aiResult) {
+                aiStatus.innerText = "Failed to get AI response";
+                aiStatus.style.color = "#f87171";
+                return;
+            }
+
+            aiStatus.innerText = aiResult.explanation;
+            aiStatus.style.color = "#60a5fa";
+            logMessage(`AI: ${aiResult.explanation}`);
+
+            if (aiResult.commands && aiResult.commands.length > 0) {
+                logMessage("Executing AI commands...");
+                await executeAICommands(aiResult.commands);
+                logMessage("AI simulation complete");
+            }
+        }
+
+        async function explainStack() {
+            if (isAnimating) {
+                logMessage("Please wait for current animation to finish", true);
+                return;
+            }
+
+            const aiStatus = document.getElementById('ai-status');
+            aiStatus.innerText = "Analyzing stack state...";
+            aiStatus.style.color = "#94a3b8";
+
+            const prompt = "Explain the current state of the stack and its LIFO principle.";
+            const aiResult = await callGeminiAPI(prompt);
+
+            if (aiResult && aiResult.explanation) {
+                aiStatus.innerText = aiResult.explanation;
+                aiStatus.style.color = "#60a5fa";
+                logMessage(`AI Explanation: ${aiResult.explanation}`);
+            } else {
+                aiStatus.innerText = "Stack currently has " + stack.length + " items. " +
+                    (stack.length > 0 ? `Top element is ${stack[stack.length - 1].value}` : "Stack is empty.");
+                aiStatus.style.color = "#60a5fa";
+            }
+        }
+
+        // --- Render Loop ---
+        function animate(time) {
+            requestAnimationFrame(animate);
+            TWEEN.update(time);
+            controls.update();
+
+            // Update any active animations
+            animations.forEach((anim, index) => {
+                if (anim()) {
+                    animations.splice(index, 1);
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('canvas-container');
+            if (container) {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            }
+        }
+
+        // Initialize
+        init();
+        lucide.createIcons();
+
+        // Mobile Nav Toggle
+        const navToggle = document.getElementById('nav-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        if (navToggle && navLinks) {
+            navToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                navToggle.classList.toggle('active');
+            });
+        }
+
+        // Navbar Attachment Animation
+        setTimeout(() => {
+            const navbar = document.querySelector('.navbar');
+            if (navbar) navbar.classList.add('compact');
+        }, 100);
+    </script>
+</body>
+
+</html>

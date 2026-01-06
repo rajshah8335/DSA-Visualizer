@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph | DSA Visualizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap');
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        /* --- Navbar & Modal Styles (Global) --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.compact {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #3b82f6;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: #3b82f6;
+        }
+
+        /* Dropdown */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: #0f172a;
+            min-width: 180px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 0.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 200;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            background: #1e293b;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: scale(0.95);
+            transition: transform 0.3s;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal.active-modal {
+            display: block;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f8fafc;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .close-modal:hover {
+            color: #fff;
+        }
+
+        .modal-content {
+            padding: 1.5rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        pre {
+            background: #0f172a;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #a78bfa;
+            margin-top: 1rem;
+        }
+
+        /* --- 3D Visualization Specific Styles (Scoped) --- */
+        #visualization-wrapper {
+            position: relative;
+        }
+
+        #canvas-container {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background-color: #0f172a;
+            cursor: move;
+        }
+
+        /* UI Panel - Adapted for Wrapper */
+        .ui-panel {
+            position: absolute;
+            top: 40px;
+            left: 20px;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 24px;
+            border-radius: 16px;
+            color: #e2e8f0;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 320px;
+            z-index: 10;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            max-height: calc(100% - 60px);
+            overflow-y: auto;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .ui-panel::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .ui-panel::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .ui-panel::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 4px;
+        }
+
+        /* Custom Inputs & Buttons */
+        .control-group {
+            margin-bottom: 12px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-bottom: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input,
+        select,
+        textarea {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 8px;
+            width: 100%;
+            font-size: 0.85rem;
+            outline: none;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #3b82f6;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        button.action-btn {
+            background: rgba(59, 130, 246, 0.8);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            width: 100%;
+            margin-top: 4px;
+            backdrop-filter: blur(4px);
+        }
+
+        button.action-btn:hover {
+            background: #3b82f6;
+            transform: translateY(-1px);
+        }
+
+        button.btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #cbd5e1;
+        }
+
+        button.btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        button.btn-danger {
+            background: rgba(239, 68, 68, 0.8);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        button.btn-danger:hover {
+            background: #ef4444;
+        }
+
+        button.btn-ai {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            border: none;
+        }
+
+        button.btn-ai:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        #status {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: #cbd5e1;
+            border-left: 3px solid #3b82f6;
+        }
+
+        #ai-response {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: #e2e8f0;
+            border-left: 3px solid #d946ef;
+            display: none;
+            line-height: 1.5;
+        }
+
+        #ai-response p {
+            margin-bottom: 0.5rem;
+        }
+
+        .legend {
+            margin-top: 15px;
+            display: flex;
+            gap: 12px;
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .loader {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #d946ef;
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 5px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            color: #cbd5e1;
+        }
+
+        @media (max-width: 768px) {
+            .controls-container {
+                width: 90% !important;
+                left: 5% !important;
+                top: 60px !important;
+                max-height: 45vh !important;
+                padding: 15px !important;
+            }
+
+            .navbar {
+                flex-wrap: wrap;
+                padding: 0.5rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="text-white h-screen w-screen relative select-none">
+
+    <!-- Compact Navbar -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <i data-lucide="zap" class="w-6 h-6 text-blue-500"></i>
+            <span>DSA</span>Visualizer
+        </a>
+        <div class="hamburger" id="nav-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <!-- Centered Tools -->
+        <div class="nav-center">
+            <a href="#" onclick="closeModals(); return false;" class="nav-link">3D Model</a>
+            <a href="theory/theory5.html" onclick="openModal('')" class="nav-link">Theory</a>
+            <a href="quiz5.html" class="nav-link">Quiz</a>
+            <a href="programs.html?filter=graph" class="nav-link">Program</a>
+        </div>
+
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="topics.html" class="nav-link">Topics</a>
+            <a href="#" class="nav-link">About</a>
+        </div>
+    </nav>
+
+    <!-- Modals -->
+    <div id="modal-overlay" class="modal-overlay" onclick="if(event.target === this) closeModals()">
+        <div id="modal-theory" class="modal">
+            <div class="modal-header">
+                <h2>Graph Theory</h2><button class="close-modal" onclick="closeModals()">×</button>
+            </div>
+            <div class="modal-content">
+                <p>A Graph consists of a finite set of vertices (nodes) and set of edges which connect a pair of nodes.
+                </p>
+                <h3 class="text-white font-bold mt-4">Terminologies:</h3>
+                <ul class="list-disc pl-5 mt-2 space-y-1">
+                    <li><strong>Vertex:</strong> A node in the graph.</li>
+                    <li><strong>Edge:</strong> A link between two vertices.</li>
+                    <li><strong>Directed/Undirected:</strong> Whether edges have direction.</li>
+                    <li><strong>Weighted:</strong> Edges have values/costs.</li>
+                </ul>
+            </div>
+        </div>
+        <div id="modal-quiz" class="modal">
+            <div class="modal-header">
+                <h2>Graph Quiz</h2><button class="close-modal" onclick="closeModals()">×</button>
+            </div>
+            <div class="modal-content">
+                <p class="font-semibold mb-4">Q1: Which traversal uses a Queue?</p>
+                <button
+                    class="w-full text-left p-3 rounded bg-slate-800 hover:bg-green-500/30 transition border border-green-500/50 mb-2">A.
+                    BFS (Correct)</button>
+                <button
+                    class="w-full text-left p-3 rounded bg-slate-800 hover:bg-blue-600/30 transition border border-slate-700">B.
+                    DFS</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Wrapper -->
+    <div id="visualization-wrapper"
+        class="relative w-full h-[calc(100vh-6rem)] mt-24 border-t border-slate-700/50 shadow-2xl overflow-hidden">
+
+        <div id="canvas-container"></div>
+
+        <div class="ui-panel" id="ui-content">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
+                <h1 class="text-lg font-bold text-blue-400">Graph Explorer 3D</h1>
+                <button onclick="toggleUI()"
+                    class="text-xs bg-slate-700 px-2 py-1 rounded text-gray-300 hover:text-white">Hide</button>
+            </div>
+
+            <!-- AI Section -->
+            <div class="control-group">
+                <label style="color: #d946ef; display:flex; align-items:center; gap:4px;"><i data-lucide="sparkles"
+                        class="w-3 h-3"></i> Gemini AI</label>
+                <textarea id="ai-prompt" placeholder="Ex: Create a binary tree with 7 nodes..."></textarea>
+                <div class="flex gap-2 mt-2">
+                    <button class="action-btn btn-ai" onclick="askGeminiAction()" id="btn-ask-ai">Simulate</button>
+                    <button class="action-btn btn-secondary" onclick="explainState()"
+                        id="btn-explain-state">Explain</button>
+                </div>
+                <div id="ai-response"></div>
+            </div>
+
+            <!-- Manual Controls -->
+            <div class="control-group">
+                <label>Add Node</label>
+                <div class="flex gap-2">
+                    <input type="text" id="node-label" placeholder="ID (e.g. A)">
+                    <button class="action-btn" style="width: 40%; margin-top:0;" onclick="addNodeFromUI()">+</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Add Edge</label>
+                <div class="flex gap-2 mb-1">
+                    <select id="source-select">
+                        <option value="">From...</option>
+                    </select>
+                    <select id="target-select">
+                        <option value="">To...</option>
+                    </select>
+                </div>
+                <button class="action-btn btn-secondary" onclick="addEdgeFromUI()">Connect</button>
+            </div>
+
+            <div class="control-group">
+                <label>Algorithms</label>
+                <div class="flex gap-2">
+                    <select id="start-node-select">
+                        <option value="">Start Node...</option>
+                    </select>
+                    <button class="action-btn" style="width: 40%; margin-top:0;" onclick="runBFS()">BFS</button>
+                </div>
+            </div>
+
+            <button class="action-btn btn-danger mt-2" onclick="resetGraph()">Reset Graph</button>
+
+            <div id="status">System Ready.</div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="dot" style="background:#3b82f6"></div>Normal
+                </div>
+                <div class="legend-item">
+                    <div class="dot" style="background:#eab308"></div>Visiting
+                </div>
+                <div class="legend-item">
+                    <div class="dot" style="background:#22c55e"></div>Visited
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Show Button (Hidden by default) -->
+        <button id="show-btn" onclick="toggleUI()"
+            class="absolute top-5 left-5 bg-slate-800/80 p-2 rounded-lg border border-slate-700 text-white text-xs hidden hover:bg-slate-700">Show
+            Controls</button>
+
+    </div>
+
+    <script>
+        // Global Modal Logic
+        function openModal(type) {
+            const overlay = document.getElementById('modal-overlay');
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(m => m.classList.remove('active-modal'));
+            const target = document.getElementById('modal-' + type);
+            if (target) {
+                overlay.classList.add('active');
+                target.classList.add('active-modal');
+            }
+        }
+
+        function closeModals() {
+            document.getElementById('modal-overlay').classList.remove('active');
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active-modal'));
+        }
+
+        function toggleUI() {
+            const panel = document.getElementById('ui-content');
+            const showBtn = document.getElementById('show-btn');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+                showBtn.classList.add('hidden');
+            } else {
+                panel.style.display = 'none';
+                showBtn.classList.remove('hidden');
+            }
+        }
+
+        // --- 3D Graph Logic with AI Integration ---
+        let isAnimating = false;
+        let lastLogMessage = "Ready.";
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0f172a);
+        scene.fog = new THREE.Fog(0x0f172a, 20, 100);
+
+        const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(0, 10, window.innerWidth < 768 ? 45 : 30);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.shadowMap.enabled = true;
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        // Lights
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+        dirLight.position.set(10, 20, 10);
+        dirLight.castShadow = true;
+        scene.add(dirLight);
+
+        const gridHelper = new THREE.GridHelper(50, 50, 0x334155, 0x1e293b);
+        gridHelper.position.y = -10;
+        scene.add(gridHelper);
+
+        // Graph Data
+        const NODES = [];
+        const EDGES = [];
+        const ADJ_LIST = {};
+
+        // Colors and Materials
+        const colors = {
+            normal: 0x3b82f6,
+            visiting: 0xeab308,
+            visited: 0x22c55e,
+            error: 0xef4444,
+            edge: 0x94a3b8
+        };
+
+        const nodeGeometry = new THREE.SphereGeometry(1, 32, 32);
+        const nodeMaterials = {
+            normal: new THREE.MeshStandardMaterial({ color: colors.normal, roughness: 0.3, metalness: 0.2 }),
+            visiting: new THREE.MeshStandardMaterial({ color: colors.visiting, emissive: 0x713f12 }),
+            visited: new THREE.MeshStandardMaterial({ color: colors.visited, emissive: 0x14532d })
+        };
+
+        // Label Helper
+        function createLabel(text, fontSize = 100) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            ctx.font = `Bold ${fontSize}px 'Inter', Arial`;
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.shadowColor = "black";
+            ctx.shadowBlur = 10;
+            ctx.fillText(text, 128, 128);
+            const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+                map: new THREE.CanvasTexture(canvas),
+                transparent: true
+            }));
+            sprite.scale.set(4, 4, 1);
+            return sprite;
+        }
+
+        class GraphNode {
+            constructor(id) {
+                this.id = id;
+                this.velocity = new THREE.Vector3();
+                this.force = new THREE.Vector3();
+                this.mesh = new THREE.Mesh(nodeGeometry, nodeMaterials.normal.clone());
+                this.mesh.castShadow = true;
+
+                // Position nodes in a circular pattern for better visualization
+                const angle = (NODES.length / 8) * Math.PI * 2;
+                const radius = 15;
+                this.mesh.position.set(
+                    Math.cos(angle) * radius,
+                    (Math.random() - 0.5) * 5,
+                    Math.sin(angle) * radius
+                );
+
+                this.sprite = createLabel(id);
+                this.mesh.add(this.sprite);
+                this.sprite.position.y = 1.5;
+                scene.add(this.mesh);
+                NODES.push(this);
+                updateSelects();
+            }
+
+            setColor(type) {
+                if (type === 'visited') {
+                    this.mesh.material = nodeMaterials.visited.clone();
+                } else if (type === 'visiting') {
+                    this.mesh.material = nodeMaterials.visiting.clone();
+                } else {
+                    this.mesh.material = nodeMaterials.normal.clone();
+                }
+            }
+
+            resetColor() {
+                this.setColor('normal');
+            }
+        }
+
+        class GraphEdge {
+            constructor(source, target, weight = null) {
+                this.source = source;
+                this.target = target;
+                this.weight = weight;
+
+                const geo = new THREE.CylinderGeometry(0.15, 0.15, 1, 8);
+                const mat = new THREE.MeshStandardMaterial({
+                    color: colors.edge,
+                    roughness: 0.4,
+                    metalness: 0.5
+                });
+                this.mesh = new THREE.Mesh(geo, mat);
+                this.mesh.castShadow = true;
+                scene.add(this.mesh);
+                EDGES.push(this);
+
+                // Add weight label if provided
+                if (weight !== null) {
+                    this.weightLabel = createLabel(weight.toString(), 80);
+                    this.mesh.add(this.weightLabel);
+                    this.weightLabel.position.y = 1.2;
+                }
+            }
+
+            updatePosition() {
+                const s = this.source.mesh.position;
+                const t = this.target.mesh.position;
+                const d = s.distanceTo(t);
+                this.mesh.position.copy(s).lerp(t, 0.5);
+                this.mesh.lookAt(t);
+                this.mesh.rotateX(Math.PI / 2);
+                this.mesh.scale.set(1, d, 1);
+            }
+
+            setColor(color) {
+                this.mesh.material.color.set(color);
+            }
+
+            resetColor() {
+                this.mesh.material.color.set(colors.edge);
+            }
+        }
+
+        // Physics Simulation for graph layout
+        function updatePhysics() {
+            const REPULSION = window.innerWidth < 768 ? 8 : 10;
+            const SPRING_LENGTH = window.innerWidth < 768 ? 5 : 8;
+            const SPRING_STRENGTH = 0.05, DAMPING = 0.90, GRAVITY = 0.01;
+
+            // Reset forces
+            NODES.forEach(n => {
+                n.force.set(0, 0, 0);
+                n.force.add(n.mesh.position.clone().multiplyScalar(-GRAVITY));
+            });
+
+            // Node repulsion
+            for (let i = 0; i < NODES.length; i++) {
+                for (let j = i + 1; j < NODES.length; j++) {
+                    const n1 = NODES[i], n2 = NODES[j];
+                    const diff = new THREE.Vector3().subVectors(n1.mesh.position, n2.mesh.position);
+                    let dist = diff.length();
+                    if (dist === 0) dist = 0.1;
+                    const forceMagnitude = REPULSION / (dist * dist);
+                    const forceDir = diff.normalize().multiplyScalar(forceMagnitude);
+                    n1.force.add(forceDir);
+                    n2.force.sub(forceDir);
+                }
+            }
+
+            // Edge spring forces
+            EDGES.forEach(e => {
+                const n1 = e.source, n2 = e.target;
+                const diff = new THREE.Vector3().subVectors(n2.mesh.position, n1.mesh.position);
+                const dist = diff.length();
+                const stretch = dist - SPRING_LENGTH;
+                const springForce = diff.normalize().multiplyScalar(stretch * SPRING_STRENGTH);
+                n1.force.add(springForce);
+                n2.force.sub(springForce);
+            });
+
+            // Apply forces
+            NODES.forEach(n => {
+                n.velocity.add(n.force);
+                n.velocity.multiplyScalar(DAMPING);
+                n.mesh.position.add(n.velocity);
+            });
+
+            // Update edge positions
+            EDGES.forEach(e => e.updatePosition());
+        }
+
+        // --- Graph Operations ---
+        function updateSelects() {
+            ['source-select', 'target-select', 'start-node-select'].forEach(id => {
+                const sel = document.getElementById(id);
+                const first = sel.options[0];
+                sel.innerHTML = '';
+                sel.appendChild(first);
+                NODES.forEach(n => {
+                    const opt = document.createElement('option');
+                    opt.value = n.id;
+                    opt.innerText = n.id;
+                    sel.appendChild(opt);
+                });
+            });
+        }
+
+        function getNode(id) {
+            return NODES.find(n => n.id === id);
+        }
+
+        function log(msg, type = 'normal') {
+            const statusEl = document.getElementById('status');
+            statusEl.innerHTML = msg;
+            lastLogMessage = msg;
+
+            // Add color based on type
+            statusEl.style.borderLeftColor =
+                type === 'error' ? '#ef4444' :
+                    type === 'success' ? '#22c55e' : '#3b82f6';
+        }
+
+        function addNode(id) {
+            if (!id) return false;
+            if (getNode(id)) return false;
+            new GraphNode(id);
+            ADJ_LIST[id] = [];
+            return true;
+        }
+
+        function addEdge(sid, tid, weight = null) {
+            const s = getNode(sid), t = getNode(tid);
+            if (!s || !t || s === t) return false;
+
+            // Check if edge already exists
+            if (ADJ_LIST[sid] && ADJ_LIST[sid].includes(tid)) return false;
+
+            // Add to adjacency list (undirected graph)
+            if (!ADJ_LIST[sid]) ADJ_LIST[sid] = [];
+            if (!ADJ_LIST[tid]) ADJ_LIST[tid] = [];
+            ADJ_LIST[sid].push({ node: tid, weight });
+            ADJ_LIST[tid].push({ node: sid, weight });
+
+            new GraphEdge(s, t, weight);
+            return true;
+        }
+
+        function addNodeFromUI() {
+            const id = document.getElementById('node-label').value.trim() || ("N" + (NODES.length + 1));
+            if (addNode(id)) {
+                log(`Added Node: ${id}`, 'success');
+                document.getElementById('node-label').value = "";
+            } else {
+                log(`Error: Node ${id} already exists.`, 'error');
+            }
+        }
+
+        function addEdgeFromUI() {
+            const s = document.getElementById('source-select').value;
+            const t = document.getElementById('target-select').value;
+            if (s && t) {
+                if (addEdge(s, t)) {
+                    log(`Linked ${s}-${t}`, 'success');
+                } else {
+                    log("Failed (duplicate or self-edge)", 'error');
+                }
+            } else {
+                log("Select both source and target nodes.", 'error');
+            }
+        }
+
+        function resetGraph() {
+            if (isAnimating) return;
+
+            // Remove all nodes and edges from scene
+            NODES.forEach(n => {
+                scene.remove(n.mesh);
+                if (n.mesh.geometry) n.mesh.geometry.dispose();
+                if (n.mesh.material) n.mesh.material.dispose();
+            });
+
+            EDGES.forEach(e => {
+                scene.remove(e.mesh);
+                if (e.mesh.geometry) e.mesh.geometry.dispose();
+                if (e.mesh.material) e.mesh.material.dispose();
+            });
+
+            // Clear arrays
+            NODES.length = 0;
+            EDGES.length = 0;
+
+            // Clear adjacency list
+            for (let k in ADJ_LIST) delete ADJ_LIST[k];
+
+            updateSelects();
+            log("Graph Reset", 'success');
+        }
+
+        async function runBFS() {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const startStr = document.getElementById('start-node-select').value;
+            if (!startStr) {
+                log("Select start node.", 'error');
+                isAnimating = false;
+                return;
+            }
+
+            log(`BFS running from ${startStr}...`, 'normal');
+
+            // Reset all colors
+            NODES.forEach(n => n.resetColor());
+            EDGES.forEach(e => e.resetColor());
+
+            const queue = [startStr];
+            const visited = new Set([startStr]);
+            const visitedOrder = [];
+
+            while (queue.length) {
+                const currId = queue.shift();
+                const node = getNode(currId);
+
+                // Highlight current node
+                node.setColor('visiting');
+                visitedOrder.push(currId);
+                log(`Visiting ${currId}`, 'normal');
+
+                await new Promise(r => setTimeout(r, 800));
+
+                // Mark as visited
+                node.setColor('visited');
+
+                // Add neighbors to queue
+                const neighbors = ADJ_LIST[currId] || [];
+                for (const neighbor of neighbors) {
+                    if (!visited.has(neighbor.node)) {
+                        visited.add(neighbor.node);
+                        queue.push(neighbor.node);
+
+                        // Highlight edge being explored
+                        const edge = EDGES.find(e =>
+                            (e.source.id === currId && e.target.id === neighbor.node) ||
+                            (e.source.id === neighbor.node && e.target.id === currId)
+                        );
+                        if (edge) edge.setColor(colors.visiting);
+                    }
+                }
+
+                await new Promise(r => setTimeout(r, 300));
+            }
+
+            log(`BFS Complete. Visited: ${visitedOrder.join(' → ')}`, 'success');
+            isAnimating = false;
+        }
+
+        // --- AI Integration (Same pattern as queue.html) ---
+        async function callGeminiAPI(userPrompt) {
+            const stateData = {
+                nodes: NODES.map(n => n.id),
+                edges: EDGES.map(e => `${e.source.id}-${e.target.id}`),
+                adjacencyList: ADJ_LIST,
+                isEmpty: NODES.length === 0
+            };
+
+            const systemPrompt = `You are an AI assistant for a 3D Graph Visualizer. Analyze the user request and return a JSON response with:
+1. Explanation of what will happen
+2. List of commands to execute
+
+Current State:
+- Nodes: ${JSON.stringify(stateData.nodes)}
+- Edges: ${JSON.stringify(stateData.edges)}
+- Empty: ${stateData.isEmpty}
+
+Available Commands:
+- addNode(id): Add a node with given ID
+- addEdge(source, target): Add edge between nodes
+- reset(): Reset graph to empty state
+- runBFS(startNode): Run BFS from start node
+- createTree(nodeCount): Create a binary tree with given node count
+- createStar(centerNode, count): Create star graph with center node
+- createCycle(nodeCount): Create cycle graph
+- createComplete(nodeCount): Create complete graph (K_n)
+
+IMPORTANT: Return ONLY JSON in this format:
+{
+    "explanation": "Brief explanation here",
+    "commands": [
+        {"cmd": "commandName", "args": [arg1, arg2, ...]}
+    ]
+}`;
+
+            try {
+                const response = await fetch("http://localhost:5000/api/gemini", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        userPrompt,
+                        systemPrompt
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Backend not available - using fallback");
+                }
+
+                const data = await response.json();
+                console.log("Backend response:", data);
+
+                let parsedData;
+                if (typeof data === 'string') {
+                    parsedData = JSON.parse(data);
+                } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                    const text = data.candidates[0].content.parts[0].text;
+                    parsedData = JSON.parse(text);
+                } else {
+                    parsedData = data;
+                }
+
+                return parsedData;
+
+            } catch (error) {
+                console.log("Using fallback AI response:", error);
+                return getFallbackResponse(userPrompt, stateData);
+            }
+        }
+
+        function getFallbackResponse(userPrompt, stateData) {
+            const prompt = userPrompt.toLowerCase();
+
+            if (prompt.includes('reset') || prompt.includes('clear') || prompt.includes('empty')) {
+                return {
+                    explanation: `**Reset Operation**: Clearing all nodes and edges from the graph.`,
+                    commands: [{ "cmd": "reset", "args": [] }]
+                };
+            } else if (prompt.includes('add node') || prompt.includes('create node')) {
+                const nodeId = extractNodeId(prompt) || `N${stateData.nodes.length + 1}`;
+                return {
+                    explanation: `**Add Node**: Creating new node with ID ${nodeId}.`,
+                    commands: [{ "cmd": "addNode", "args": [nodeId] }]
+                };
+            } else if (prompt.includes('add edge') || prompt.includes('connect') || prompt.includes('link')) {
+                const nodes = extractAllNodeIds(prompt);
+                const source = nodes[0] || (stateData.nodes[0] || 'A');
+                const target = nodes[1] || (stateData.nodes[1] || 'B');
+                return {
+                    explanation: `**Add Edge**: Connecting node ${source} to ${target}.`,
+                    commands: [{ "cmd": "addEdge", "args": [source, target] }]
+                };
+            } else if (prompt.includes('bfs') || prompt.includes('breadth') || prompt.includes('traverse')) {
+                const startNode = extractNodeId(prompt) || (stateData.nodes[0] || 'A');
+                return {
+                    explanation: `**BFS Traversal**: Running Breadth-First Search starting from node ${startNode}.`,
+                    commands: [{ "cmd": "runBFS", "args": [startNode] }]
+                };
+            } else if (prompt.includes('tree') || prompt.includes('binary')) {
+                const count = extractNumber(prompt) || 7;
+                return {
+                    explanation: `**Tree Creation**: Building a binary tree with ${count} nodes.`,
+                    commands: [{ "cmd": "createTree", "args": [count] }]
+                };
+            } else if (prompt.includes('star') || prompt.includes('hub')) {
+                const center = extractNodeId(prompt) || 'A';
+                const count = extractNumber(prompt) || 5;
+                return {
+                    explanation: `**Star Graph**: Creating star graph with center ${center} and ${count - 1} surrounding nodes.`,
+                    commands: [{ "cmd": "createStar", "args": [center, count] }]
+                };
+            } else if (prompt.includes('cycle') || prompt.includes('ring')) {
+                const count = extractNumber(prompt) || 6;
+                return {
+                    explanation: `**Cycle Graph**: Creating a cycle graph with ${count} nodes.`,
+                    commands: [{ "cmd": "createCycle", "args": [count] }]
+                };
+            } else if (prompt.includes('complete') || prompt.includes('fully connected')) {
+                const count = extractNumber(prompt) || 4;
+                return {
+                    explanation: `**Complete Graph**: Creating complete graph K_${count} (all nodes connected to each other).`,
+                    commands: [{ "cmd": "createComplete", "args": [count] }]
+                };
+            }
+
+            // Default explanation for state
+            return {
+                explanation: `**Current Graph State**: ${stateData.nodes.length} nodes, ${stateData.edges.length} edges. Nodes: ${stateData.nodes.join(', ')}.`,
+                commands: []
+            };
+        }
+
+        function extractNumber(text) {
+            const match = text.match(/\d+/);
+            return match ? parseInt(match[0]) : null;
+        }
+
+        function extractNodeId(text) {
+            const match = text.match(/[A-Za-z][A-Za-z0-9]*/);
+            return match ? match[0] : null;
+        }
+
+        function extractAllNodeIds(text) {
+            const matches = text.match(/[A-Za-z][A-Za-z0-9]*/g);
+            return matches || [];
+        }
+
+        async function executeAICommands(commandList) {
+            if (!commandList || !Array.isArray(commandList)) {
+                console.error("Invalid command list:", commandList);
+                return;
+            }
+
+            for (const item of commandList) {
+                const { cmd, args } = item;
+                console.log("Executing:", cmd, "with args:", args);
+
+                // Wait for animation to complete
+                while (isAnimating) {
+                    await new Promise(r => setTimeout(r, 100));
+                }
+
+                try {
+                    switch (cmd) {
+                        case 'addNode':
+                            addNode(args[0]);
+                            break;
+                        case 'addEdge':
+                            addEdge(args[0], args[1]);
+                            break;
+                        case 'reset':
+                            resetGraph();
+                            break;
+                        case 'runBFS':
+                            document.getElementById('start-node-select').value = args[0];
+                            await runBFS();
+                            break;
+                        case 'createTree':
+                            await createTree(args[0]);
+                            break;
+                        case 'createStar':
+                            await createStar(args[0], args[1]);
+                            break;
+                        case 'createCycle':
+                            await createCycle(args[0]);
+                            break;
+                        case 'createComplete':
+                            await createCompleteGraph(args[0]);
+                            break;
+                        default:
+                            console.warn("Unknown command:", cmd);
+                    }
+                } catch (error) {
+                    console.error("Error executing command:", cmd, error);
+                    log(`Error executing: ${cmd}`, 'error');
+                }
+
+                await new Promise(r => setTimeout(r, 500));
+            }
+        }
+
+        // Graph generation functions
+        async function createTree(nodeCount) {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            resetGraph();
+            log(`Creating binary tree with ${nodeCount} nodes...`, 'normal');
+
+            // Add nodes
+            for (let i = 0; i < nodeCount; i++) {
+                const nodeId = String.fromCharCode(65 + i); // A, B, C, ...
+                addNode(nodeId);
+                await new Promise(r => setTimeout(r, 200));
+            }
+
+            // Add edges (binary tree structure)
+            for (let i = 0; i < nodeCount; i++) {
+                const leftChild = 2 * i + 1;
+                const rightChild = 2 * i + 2;
+
+                if (leftChild < nodeCount) {
+                    const parentId = String.fromCharCode(65 + i);
+                    const childId = String.fromCharCode(65 + leftChild);
+                    addEdge(parentId, childId);
+                    await new Promise(r => setTimeout(r, 200));
+                }
+
+                if (rightChild < nodeCount) {
+                    const parentId = String.fromCharCode(65 + i);
+                    const childId = String.fromCharCode(65 + rightChild);
+                    addEdge(parentId, childId);
+                    await new Promise(r => setTimeout(r, 200));
+                }
+            }
+
+            log(`Binary tree created with ${nodeCount} nodes`, 'success');
+            isAnimating = false;
+        }
+
+        async function createStar(centerNode, count) {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            resetGraph();
+            log(`Creating star graph with center ${centerNode}...`, 'normal');
+
+            // Add center node
+            addNode(centerNode);
+
+            // Add surrounding nodes
+            for (let i = 1; i < count; i++) {
+                const nodeId = `${centerNode}${i}`;
+                addNode(nodeId);
+                addEdge(centerNode, nodeId);
+                await new Promise(r => setTimeout(r, 300));
+            }
+
+            log(`Star graph created with ${count} nodes`, 'success');
+            isAnimating = false;
+        }
+
+        async function createCycle(nodeCount) {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            resetGraph();
+            log(`Creating cycle graph with ${nodeCount} nodes...`, 'normal');
+
+            // Add nodes
+            for (let i = 0; i < nodeCount; i++) {
+                const nodeId = String.fromCharCode(65 + i);
+                addNode(nodeId);
+                await new Promise(r => setTimeout(r, 200));
+            }
+
+            // Connect in a cycle
+            for (let i = 0; i < nodeCount; i++) {
+                const current = String.fromCharCode(65 + i);
+                const next = String.fromCharCode(65 + ((i + 1) % nodeCount));
+                addEdge(current, next);
+                await new Promise(r => setTimeout(r, 200));
+            }
+
+            log(`Cycle graph created with ${nodeCount} nodes`, 'success');
+            isAnimating = false;
+        }
+
+        async function createCompleteGraph(nodeCount) {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            resetGraph();
+            log(`Creating complete graph K_${nodeCount}...`, 'normal');
+
+            // Add nodes
+            for (let i = 0; i < nodeCount; i++) {
+                const nodeId = String.fromCharCode(65 + i);
+                addNode(nodeId);
+                await new Promise(r => setTimeout(r, 200));
+            }
+
+            // Connect all nodes to each other
+            for (let i = 0; i < nodeCount; i++) {
+                for (let j = i + 1; j < nodeCount; j++) {
+                    const node1 = String.fromCharCode(65 + i);
+                    const node2 = String.fromCharCode(65 + j);
+                    addEdge(node1, node2);
+                    await new Promise(r => setTimeout(r, 100));
+                }
+            }
+
+            log(`Complete graph K_${nodeCount} created`, 'success');
+            isAnimating = false;
+        }
+
+        function showAIResponse(text, isThinking = false) {
+            const responseEl = document.getElementById('ai-response');
+
+            // Format the text (simple markdown support)
+            const formatted = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+
+            responseEl.innerHTML = formatted;
+            responseEl.style.display = 'block';
+
+            if (isThinking) {
+                responseEl.style.borderLeftColor = '#a855f7';
+                responseEl.style.backgroundColor = 'rgba(168, 85, 247, 0.1)';
+            } else {
+                responseEl.style.borderLeftColor = '#d946ef';
+                responseEl.style.backgroundColor = 'rgba(217, 70, 239, 0.1)';
+            }
+        }
+
+        function hideAIResponse() {
+            document.getElementById('ai-response').style.display = 'none';
+        }
+
+        async function processAICommand(prompt, showResponse = false) {
+            if (!prompt) {
+                log("Please enter an AI command", 'error');
+                return;
+            }
+
+            const btnAsk = document.getElementById('btn-ask-ai');
+            const btnExplain = document.getElementById('btn-explain-state');
+
+            if (showResponse) {
+                showAIResponse("Analyzing your request...", true);
+            }
+
+            btnAsk.disabled = true;
+            btnExplain.disabled = true;
+            btnAsk.innerHTML = 'Thinking... <div class="loader"></div>';
+
+            const aiResult = await callGeminiAPI(prompt);
+
+            btnAsk.innerHTML = 'Simulate';
+            btnAsk.disabled = false;
+            btnExplain.disabled = false;
+
+            if (!aiResult) {
+                log("AI response error", 'error');
+                if (showResponse) {
+                    showAIResponse("Failed to get AI response. Please try again.");
+                }
+                return;
+            }
+
+            if (showResponse) {
+                showAIResponse(aiResult.explanation || "No explanation provided");
+                log("AI response received", 'success');
+            } else {
+                log("AI processing...", 'normal');
+            }
+
+            if (aiResult.commands && aiResult.commands.length > 0) {
+                if (showResponse) {
+                    log("Executing AI commands...", 'normal');
+                }
+                await executeAICommands(aiResult.commands);
+                log("AI simulation complete", 'success');
+            }
+        }
+
+        async function askGeminiAction() {
+            const prompt = document.getElementById('ai-prompt').value.trim();
+            await processAICommand(prompt, true);
+        }
+
+        async function explainState() {
+            const prompt = "Explain the current state of the graph data structure.";
+            await processAICommand(prompt, true);
+        }
+
+        // Initialize default graph
+        function initDefaultGraph() {
+            resetGraph();
+
+            // Create a default graph
+            ['A', 'B', 'C', 'D', 'E'].forEach(id => addNode(id));
+
+            // Add some edges
+            setTimeout(() => {
+                addEdge('A', 'B');
+                addEdge('A', 'C');
+                addEdge('B', 'D');
+                addEdge('C', 'D');
+                addEdge('D', 'E');
+                log("Default graph loaded", 'success');
+            }, 100);
+        }
+
+        // Event Listeners
+        window.addEventListener('resize', () => {
+            const c = document.getElementById('canvas-container');
+            camera.aspect = c.clientWidth / c.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(c.clientWidth, c.clientHeight);
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            updatePhysics();
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Initialize everything
+        function init() {
+            initDefaultGraph();
+            lucide.createIcons();
+            animate();
+
+            // Setup AI prompt enter key
+            document.getElementById('ai-prompt').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    askGeminiAction();
+                }
+            });
+        }
+
+        // Mobile Nav Toggle
+        const navToggle = document.getElementById('nav-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        if (navToggle && navLinks) {
+            navToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                navToggle.classList.toggle('active');
+            });
+        }
+
+        // Navbar Attachment Animation
+        setTimeout(() => {
+            const navbar = document.querySelector('.navbar');
+            if (navbar) navbar.classList.add('compact');
+        }, 100);
+
+        // Initialize the application
+        init();
+    </script>
+</body>
+
+</html>

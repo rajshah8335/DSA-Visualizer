@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linked List | DSA Visualizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: white;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        /* --- Navbar & Modal Styles (Global) --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.compact {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #3b82f6;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: #3b82f6;
+        }
+
+        /* Dropdown */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: #0f172a;
+            min-width: 180px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 0.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 200;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            background: #1e293b;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: scale(0.95);
+            transition: transform 0.3s;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal.active-modal {
+            display: block;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f8fafc;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .close-modal:hover {
+            color: #fff;
+        }
+
+        .modal-content {
+            padding: 1.5rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        pre {
+            background: #0f172a;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #a78bfa;
+            margin-top: 1rem;
+        }
+
+        /* --- 3D Visualization Specific Styles (Scoped) --- */
+        @media (max-width: 768px) {
+            .controls-container {
+                width: 90% !important;
+                left: 5% !important;
+                top: 60px !important;
+                max-height: 40vh !important;
+                padding: 15px !important;
+            }
+
+            .navbar {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .nav-links {
+                display: none;
+                /* Simplify for now or use hamburger if I had time to impl everywhere */
+            }
+        }
+
+        #visualization-wrapper {
+            position: relative;
+            /* background-color: #050505; */
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Top Bar: List Type Selection */
+        .top-bar {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            pointer-events: auto;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            margin-top: 0;
+        }
+
+        .type-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            padding: 8px 20px;
+            border-radius: 99px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        .type-btn.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            color: #60a5fa;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+            font-weight: 600;
+        }
+
+        .type-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        /* Bottom Control Panel */
+        .controls-container {
+            pointer-events: auto;
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            width: 280px;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            max-height: calc(100% - 100px);
+            /* Fit within wrapper */
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        input[type="number"] {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            padding: 8px;
+            border-radius: 8px;
+            width: 50px;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        button.action-btn {
+            background: rgba(59, 130, 246, 0.8);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.2);
+            font-size: 0.8rem;
+            flex-grow: 1;
+            text-align: center;
+            backdrop-filter: blur(4px);
+        }
+
+        button.action-btn:hover {
+            background: #3b82f6;
+            transform: translateY(-2px);
+        }
+
+        button.action-btn.danger {
+            background: #dc2626;
+        }
+
+        button.action-btn.danger:hover {
+            background: #ef4444;
+        }
+
+        button.action-btn.warning {
+            background: #d97706;
+        }
+
+        button.action-btn.warning:hover {
+            background: #f59e0b;
+        }
+
+        /* Gemini AI Section */
+        .ai-section {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 10px;
+            padding-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .ai-label {
+            color: #c084fc;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .ai-input {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(192, 132, 252, 0.3);
+            color: #e9d5ff;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .ai-input:focus {
+            outline: none;
+            border-color: #c084fc;
+        }
+
+        .ai-btn {
+            background: linear-gradient(135deg, #9333ea, #7c3aed);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
+            transition: all 0.2s;
+        }
+
+        .ai-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(124, 58, 237, 0.4);
+        }
+
+        .ai-btn.secondary {
+            background: rgba(124, 58, 237, 0.1);
+            border: 1px solid rgba(124, 58, 237, 0.5);
+            color: #d8b4fe;
+        }
+
+        .ai-btn.secondary:hover {
+            background: rgba(124, 58, 237, 0.2);
+        }
+
+        #ai-explanation {
+            font-size: 0.85rem;
+            color: #d8b4fe;
+            background: rgba(88, 28, 135, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 2px solid #c084fc;
+            display: none;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        /* Algorithm Log/Explanation */
+        .algo-log {
+            pointer-events: auto;
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            width: 300px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 0.9rem;
+            color: #ddd;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .algo-log h3 {
+            margin-top: 0;
+            color: #4f46e5;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+            border-left: 2px solid #4f46e5;
+            padding-left: 8px;
+        }
+
+        .label {
+            position: absolute;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 4px 8px;
+            border-radius: 4px;
+            pointer-events: none;
+            user-select: none;
+            transform: translate(-50%, -50%);
+            white-space: nowrap;
+        }
+
+        .tutorial-hint {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            pointer-events: none;
+            font-size: 0.85rem;
+            user-select: none;
+        }
+
+        #show-controls-btn {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            pointer-events: auto;
+            display: none;
+            background: rgba(20, 20, 30, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s;
+        }
+
+        #show-controls-btn:hover {
+            background: #3b82f6;
+            transform: translateY(-2px);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="text-white h-screen w-screen relative select-none">
+
+    <!-- Compact Navbar -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <i data-lucide="zap" class="w-6 h-6 text-blue-500"></i>
+            <span>DSA</span>Visualizer
+        </a>
+        <div class="hamburger" id="nav-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <!-- Centered Tools -->
+        <div class="nav-center">
+            <a href="#" onclick="closeModals(); return false;" class="nav-link">3D Model</a>
+            <a href="theory/theory2.html" onclick="openModal('')" class="nav-link">Theory</a>
+            <a href="quiz2.html" class="nav-link">Quiz</a>
+            <a href="programs.html?filter=linkedlist" class="nav-link">Program</a>
+        </div>
+
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="topics.html" class="nav-link">Topics</a>
+            <a href="#" class="nav-link">About</a>
+        </div>
+    </nav>
+
+    <!-- Modals Overlay -->
+    <div id="modal-overlay" class="modal-overlay" onclick="if(event.target === this) closeModals()">
+        <!-- Theory -->
+        <div id="modal-theory" class="modal">
+            <div class="modal-header">
+                <h2>Linked List Theory</h2><button class="close-modal" onclick="closeModals()">×</button>
+            </div>
+            <div class="modal-content">
+                <p>A Linked List is a linear data structure where elements are not stored at contiguous memory
+                    locations. The elements in a linked list are linked using pointers.</p>
+                <h3 class="text-white font-bold mt-4">Types:</h3>
+                <ul class="list-disc pl-5 mt-2 space-y-1">
+                    <li><strong>Singly Linked List:</strong> Each node points to the next node.</li>
+                    <li><strong>Doubly Linked List:</strong> Nodes point to both next and previous nodes.</li>
+                    <li><strong>Circular Linked List:</strong> The last node points back to the first.</li>
+                </ul>
+            </div>
+        </div>
+        <!-- Quiz -->
+        <div id="modal-quiz" class="modal">
+            <div class="modal-header">
+                <h2>Linked List Quiz</h2><button class="close-modal" onclick="closeModals()">×</button>
+            </div>
+            <div class="modal-content">
+                <p class="font-semibold mb-4">Q1: What is the time complexity to insert a node at the beginning?</p>
+                <div class="space-y-2">
+                    <button
+                        class="w-full text-left p-3 rounded bg-slate-800 hover:bg-green-500/30 transition border border-green-500/50">A.
+                        O(1) (Correct)</button>
+                    <button
+                        class="w-full text-left p-3 rounded bg-slate-800 hover:bg-blue-600/30 transition border border-slate-700">B.
+                        O(n)</button>
+                    <button
+                        class="w-full text-left p-3 rounded bg-slate-800 hover:bg-blue-600/30 transition border border-slate-700">C.
+                        O(log n)</button>
+                </div>
+            </div>
+        </div>
+        <!-- Program -->
+        <div id="modal-program" class="modal">
+            <div class="modal-header">
+                <h2>C++ Implementation</h2><button class="close-modal" onclick="closeModals()">×</button>
+            </div>
+            <div class="modal-content">
+                <p>Basic struct for a Node.</p>
+                <pre>
+struct Node {
+    int data;
+    Node* next;
+    
+    Node(int val) {
+        data = val;
+        next = nullptr;
+    }
+};</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Wrapper (Below Navbar) -->
+    <div id="visualization-wrapper"
+        class="relative w-full h-[calc(100vh-6rem)] mt-24 border-t border-slate-700/50 shadow-2xl overflow-hidden">
+
+        <!-- 3D Canvas Container -->
+        <div id="canvas-container" class="absolute inset-0 z-0 cursor-move bg-[#050505]"></div>
+
+        <!-- Linked List UI Overlay (Inside Wrapper) -->
+        <div id="ui-layer">
+            <div class="top-bar">
+                <button class="type-btn active" onclick="switchMode('singly')">Singly Linked</button>
+                <button class="type-btn" onclick="switchMode('doubly')">Doubly Linked</button>
+                <button class="type-btn" onclick="switchMode('circular')">Circular Linked</button>
+            </div>
+
+            <div class="algo-log">
+                <h3>Operation Log</h3>
+                <div id="log-content">
+                    <div class="log-entry">Welcome! Select a list type and perform operations.</div>
+                </div>
+            </div>
+
+            <div class="tutorial-hint">Drag to Rotate • Scroll to Zoom • Right Click to Pan</div>
+
+            <!-- Show Controls Button (Initially valid for small screens or toggled) -->
+            <button id="show-controls-btn" onclick="toggleControls()">Show Controls</button>
+
+            <div class="controls-container" id="controls-panel">
+                <!-- Header -->
+                <div
+                    style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;">
+                    <span style="font-weight:600; color:#4f46e5; font-size:0.9rem;">Operations</span>
+                    <button onclick="toggleControls()"
+                        style="background:transparent; border:none; color:#aaa; cursor:pointer; font-size:1.2rem; line-height:1;">×</button>
+                </div>
+
+                <div class="controls-row">
+                    <input type="number" id="data-input" placeholder="Value" value="10">
+                    <button class="action-btn" onclick="handleInsert('head')">Insert Head</button>
+                    <button class="action-btn" onclick="handleInsert('tail')">Insert Tail</button>
+                    <input type="number" id="index-input" placeholder="Index" value="1" style="width: 50px;">
+                    <button class="action-btn" onclick="handleInsert('index')">Insert at Idx</button>
+                </div>
+                <div class="controls-row">
+                    <button class="action-btn danger" onclick="handleDelete('head')">Delete Head</button>
+                    <button class="action-btn danger" onclick="handleDelete('tail')">Delete Tail</button>
+                    <button class="action-btn danger" onclick="handleDelete('index')">Delete Idx</button>
+                </div>
+                <div class="controls-row">
+                    <input type="number" id="search-input" placeholder="Val" value="10" style="width: 50px;">
+                    <button class="action-btn warning" onclick="handleSearch()">Search</button>
+                    <button class="action-btn warning" onclick="handleReverse()">Reverse</button>
+                </div>
+
+                <!-- Gemini AI Section -->
+                <div class="ai-section">
+                    <div class="ai-label">Gemini AI Assistant</div>
+                    <textarea id="ai-prompt" class="ai-input"
+                        placeholder="e.g. 'Insert 10, 20, 30 then delete head' or 'Find 15'"></textarea>
+                    <div style="display:flex; gap:8px;">
+                        <button class="ai-btn" style="flex:1;" onclick="handleAutoSimulate()">Auto Simulate</button>
+                        <button class="ai-btn secondary" style="flex:1;" onclick="handleExplainState()">Explain
+                            State</button>
+                    </div>
+                    <div id="ai-explanation"></div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- End Visualization Wrapper -->
+
+    <script>
+        // --- Modal Logic ---
+        // --- Modal Logic ---
+        function openModal(type) {
+            const overlay = document.getElementById('modal-overlay');
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(m => m.classList.remove('active-modal'));
+            const target = document.getElementById('modal-' + type);
+            if (target) {
+                overlay.classList.add('active');
+                target.classList.add('active-modal');
+            }
+        }
+
+        function closeModals() {
+            document.getElementById('modal-overlay').classList.remove('active');
+            document.querySelectorAll('.modal').forEach(m => {
+                m.classList.remove('active-modal');
+            });
+        }
+
+        // --- 3D Visualization Logic ---
+        const CONFIG = {
+            nodeSpacing: 4.5,
+            nodeSize: 1.5,
+            colors: {
+                node: 0x3b82f6,
+                nodeHighlight: 0xa855f7,
+                nodeFound: 0x10b981,
+                link: 0x94a3b8,
+                text: 'white'
+            }
+        };
+
+        let currentMode = 'singly';
+        let nodes = [];
+        let isAnimating = false;
+
+        // --- Three.js Setup ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0f172a);
+        scene.fog = new THREE.FogExp2(0x0f172a, 0.02);
+
+        const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(0, 8, 20);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxPolarAngle = Math.PI / 2 - 0.05;
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        dirLight.position.set(10, 20, 10);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
+        dirLight.shadow.bias = -0.0001;
+        scene.add(dirLight);
+
+        const backLight = new THREE.DirectionalLight(0x6366f1, 0.5);
+        backLight.position.set(-10, 5, -20);
+        scene.add(backLight);
+
+        const pointLight = new THREE.PointLight(0x4f46e5, 0.8, 20);
+        pointLight.position.set(0, 5, 0);
+        scene.add(pointLight);
+
+        // Grid & Environment
+        const environmentGroup = new THREE.Group();
+        scene.add(environmentGroup);
+
+        const gridHelper = new THREE.GridHelper(300, 30, 0x4f46e5, 0x000000);
+        gridHelper.position.y = -2.5;
+        gridHelper.material.opacity = 0.5;
+        gridHelper.material.transparent = true;
+        environmentGroup.add(gridHelper);
+
+        const subGridHelper = new THREE.GridHelper(300, 150, 0x333333, 0x000000);
+        subGridHelper.position.y = -2.5;
+        subGridHelper.material.opacity = 0.15;
+        subGridHelper.material.transparent = true;
+        environmentGroup.add(subGridHelper);
+
+        const planeGeo = new THREE.PlaneGeometry(2000, 2000);
+        const planeMat = new THREE.MeshStandardMaterial({
+            color: 0x0f172a,
+            roughness: 0.5,
+            metalness: 0.1
+        });
+        const floor = new THREE.Mesh(planeGeo, planeMat);
+        floor.rotation.x = -Math.PI / 2;
+        floor.position.y = -2.51;
+        floor.receiveShadow = true;
+        environmentGroup.add(floor);
+
+        const listGroup = new THREE.Group();
+        scene.add(listGroup);
+
+        // --- Helpers ---
+        function createTextTexture(text) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(0, 0, 256, 256);
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 15;
+            ctx.strokeRect(10, 10, 236, 236);
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 110px Inter, Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, 128, 128);
+            ctx.globalAlpha = 0.2;
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(256, 0);
+            ctx.lineTo(0, 256);
+            ctx.fill();
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        function createIndexTexture(index) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            ctx.beginPath();
+            ctx.arc(32, 32, 30, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#fbbf24';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            ctx.fillStyle = '#fbbf24';
+            ctx.font = 'bold 30px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(index, 32, 34);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        class ListNode {
+            constructor(value) {
+                this.value = value;
+                this.uuid = THREE.MathUtils.generateUUID();
+                const geometry = new THREE.BoxGeometry(CONFIG.nodeSize, CONFIG.nodeSize, CONFIG.nodeSize);
+                const material = new THREE.MeshStandardMaterial({
+                    map: createTextTexture(value),
+                    color: 0xffffff,
+                    roughness: 0.2,
+                    metalness: 0.1
+                });
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.castShadow = true;
+                this.mesh.userData = { id: this.uuid, value: value };
+                const glowGeo = new THREE.BoxGeometry(CONFIG.nodeSize + 0.2, CONFIG.nodeSize + 0.2, CONFIG.nodeSize + 0.2);
+                const glowMat = new THREE.MeshBasicMaterial({
+                    color: CONFIG.colors.node,
+                    transparent: true,
+                    opacity: 0.1,
+                    side: THREE.BackSide,
+                    depthWrite: false
+                });
+                this.glow = new THREE.Mesh(glowGeo, glowMat);
+                this.mesh.add(this.glow);
+                this.indexSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: null, transparent: true }));
+                this.indexSprite.position.set(0, 1.3, 0);
+                this.indexSprite.scale.set(0.8, 0.8, 0.8);
+                this.mesh.add(this.indexSprite);
+                this.currentIndex = -1;
+            }
+
+            updateIndex(newIndex) {
+                if (this.currentIndex === newIndex) return;
+                this.currentIndex = newIndex;
+                if (this.indexSprite.material.map) {
+                    this.indexSprite.material.map.dispose();
+                }
+                this.indexSprite.material.map = createIndexTexture(newIndex);
+            }
+
+            highlight(colorHex) {
+                new TWEEN.Tween(this.mesh.material)
+                    .to({ emissive: new THREE.Color(colorHex), emissiveIntensity: 0.8 }, 300)
+                    .start();
+                new TWEEN.Tween(this.glow.scale)
+                    .to({ x: 1.2, y: 1.2, z: 1.2 }, 300)
+                    .yoyo(true)
+                    .repeat(1)
+                    .start();
+                this.glow.material.color.setHex(colorHex);
+            }
+
+            resetColor() {
+                new TWEEN.Tween(this.mesh.material)
+                    .to({ emissive: new THREE.Color(0x000000), emissiveIntensity: 0 }, 300)
+                    .start();
+                this.glow.material.color.setHex(CONFIG.colors.node);
+            }
+        }
+
+        function clearScene() {
+            while (listGroup.children.length > 0) {
+                listGroup.remove(listGroup.children[0]);
+            }
+            nodes = [];
+        }
+
+        function createArrow(start, end, color = 0xffffff, curve = false) {
+            const dir = new THREE.Vector3().subVectors(end, start);
+            const length = dir.length();
+            if (length < 0.1) return null;
+
+            if (curve) {
+                const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+                mid.y += 5;
+                mid.z += 3;
+                const curvePath = new THREE.QuadraticBezierCurve3(start, mid, end);
+                const points = curvePath.getPoints(30);
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                const material = new THREE.LineBasicMaterial({ color: color, linewidth: 2 });
+                const curveObject = new THREE.Line(geometry, material);
+                const tangent = curvePath.getTangent(1).normalize();
+                const coneGeo = new THREE.ConeGeometry(0.25, 0.7, 16);
+                const coneMat = new THREE.MeshBasicMaterial({ color: color });
+                const cone = new THREE.Mesh(coneGeo, coneMat);
+                const conePos = end.clone().sub(tangent.multiplyScalar(CONFIG.nodeSize / 2 + 0.5));
+                cone.position.copy(conePos);
+                cone.lookAt(cone.position.clone().add(tangent));
+                const group = new THREE.Group();
+                group.add(curveObject);
+                group.add(cone);
+                return group;
+            } else {
+                const halfSize = CONFIG.nodeSize / 2;
+                const offsetVec = dir.clone().normalize().multiplyScalar(halfSize);
+                const adjustedStart = start.clone().add(offsetVec);
+                const adjustedEnd = end.clone().sub(offsetVec);
+                const arrowLength = adjustedStart.distanceTo(adjustedEnd);
+                const arrowHelper = new THREE.ArrowHelper(dir.normalize(), adjustedStart, arrowLength, color, 0.6, 0.3);
+                return arrowHelper;
+            }
+        }
+
+        function createSelfLoop(position) {
+            const curvePath = new THREE.CubicBezierCurve3(
+                new THREE.Vector3(position.x + 0.5, position.y, position.z + 0.5),
+                new THREE.Vector3(position.x + 2, position.y, position.z + 2),
+                new THREE.Vector3(position.x - 2, position.y, position.z + 2),
+                new THREE.Vector3(position.x - 0.5, position.y, position.z + 0.5)
+            );
+            const points = curvePath.getPoints(30);
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const material = new THREE.LineBasicMaterial({ color: CONFIG.colors.link, linewidth: 2 });
+            const loopLine = new THREE.Line(geometry, material);
+            const coneGeo = new THREE.ConeGeometry(0.25, 0.7, 16);
+            const coneMat = new THREE.MeshBasicMaterial({ color: CONFIG.colors.link });
+            const cone = new THREE.Mesh(coneGeo, coneMat);
+            const endPoint = points[points.length - 1];
+            const tangent = curvePath.getTangent(1).normalize();
+            cone.position.copy(endPoint);
+            cone.lookAt(endPoint.clone().add(tangent));
+            const group = new THREE.Group();
+            group.add(loopLine);
+            group.add(cone);
+            return group;
+        }
+
+        function renderList() {
+            listGroup.children.forEach(child => {
+                if (child.type === 'ArrowHelper' || child.type === 'Group' || child.type === 'Line') {
+                    child.userData.toBeRemoved = true;
+                }
+            });
+            listGroup.children = listGroup.children.filter(c => !c.userData.toBeRemoved);
+
+            if (currentMode === 'circular') {
+                const count = nodes.length;
+                const radius = count > 1 ? Math.max(5, (count * CONFIG.nodeSpacing) / (2 * Math.PI)) : 0;
+
+                nodes.forEach((node, i) => {
+                    node.updateIndex(i);
+                    const angle = (i / count) * Math.PI * 2 - (Math.PI / 2);
+                    const tx = count > 1 ? Math.cos(angle) * radius : 0;
+                    const tz = count > 1 ? Math.sin(angle) * radius : 0;
+                    new TWEEN.Tween(node.mesh.position).to({ x: tx, y: 0, z: tz }, 500).easing(TWEEN.Easing.Quadratic.Out).start();
+                    if (!listGroup.children.includes(node.mesh)) {
+                        listGroup.add(node.mesh);
+                        node.mesh.scale.set(0, 0, 0);
+                        new TWEEN.Tween(node.mesh.scale).to({ x: 1, y: 1, z: 1 }, 500).start();
+                    }
+                    new TWEEN.Tween(node.mesh.rotation).to({ y: -angle + Math.PI / 2 }, 500).start();
+                });
+
+                setTimeout(() => {
+                    listGroup.children = listGroup.children.filter(c => c.type === 'Mesh' || (c.type === 'Group' && c.children[0]?.type === 'Mesh'));
+                    for (let i = 0; i < count; i++) {
+                        const startNode = nodes[i];
+                        if (count > 1) {
+                            const angle1 = (i / count) * Math.PI * 2 - (Math.PI / 2);
+                            const angle2 = (((i + 1) % count) / count) * Math.PI * 2 - (Math.PI / 2);
+                            const p1 = new THREE.Vector3(Math.cos(angle1) * radius, 0, Math.sin(angle1) * radius);
+                            const p2 = new THREE.Vector3(Math.cos(angle2) * radius, 0, Math.sin(angle2) * radius);
+                            const arrow = createArrow(p1, p2, CONFIG.colors.link);
+                            if (arrow) listGroup.add(arrow);
+                        } else {
+                            const loop = createSelfLoop(startNode.mesh.position);
+                            if (loop) listGroup.add(loop);
+                        }
+                    }
+                }, 500);
+
+            } else {
+                // LINEAR LAYOUT (Singly/Doubly)
+                const mobile = false;
+                const totalWidth = (nodes.length - 1) * CONFIG.nodeSpacing;
+                const startX = mobile ? 0 : -totalWidth / 2;
+                const startY = mobile ? (nodes.length * CONFIG.nodeSpacing) / 2 - 2 : 0;
+
+                nodes.forEach((node, index) => {
+                    node.updateIndex(index);
+                    const targetX = mobile ? 0 : startX + (index * CONFIG.nodeSpacing);
+                    const targetY = mobile ? startY - (index * CONFIG.nodeSpacing) : 0;
+
+                    new TWEEN.Tween(node.mesh.rotation).to({ y: 0 }, 500).start();
+                    new TWEEN.Tween(node.mesh.position).to({ x: targetX, y: targetY, z: 0 }, 500).easing(TWEEN.Easing.Quadratic.Out).start();
+                    if (!listGroup.children.includes(node.mesh)) {
+                        listGroup.add(node.mesh);
+                        node.mesh.scale.set(0, 0, 0);
+                        new TWEEN.Tween(node.mesh.scale).to({ x: 1, y: 1, z: 1 }, 500).easing(TWEEN.Easing.Elastic.Out).start();
+                    }
+                });
+
+                setTimeout(() => {
+                    listGroup.children = listGroup.children.filter(c => c.type === 'Mesh' || (c.type === 'Group' && c.children[0]?.type === 'Mesh'));
+                    for (let i = 0; i < nodes.length; i++) {
+                        const next = nodes[i + 1];
+                        if (next) {
+                            let p1, p2;
+                            if (mobile) {
+                                p1 = new THREE.Vector3(0, startY - i * CONFIG.nodeSpacing - (CONFIG.nodeSize / 2 + 0.1), 0);
+                                p2 = new THREE.Vector3(0, startY - (i + 1) * CONFIG.nodeSpacing + (CONFIG.nodeSize / 2 + 0.1), 0);
+                            } else {
+                                p1 = new THREE.Vector3(startX + i * CONFIG.nodeSpacing, 0, 0);
+                                p2 = new THREE.Vector3(startX + (i + 1) * CONFIG.nodeSpacing, 0, 0);
+                            }
+
+                            const arrow = createArrow(p1, p2, CONFIG.colors.link);
+                            if (arrow) listGroup.add(arrow);
+
+                            if (currentMode === 'doubly') {
+                                let dp1, dp2;
+                                if (mobile) {
+                                    dp1 = new THREE.Vector3(0.8, startY - (i + 1) * CONFIG.nodeSpacing, 0);
+                                    dp2 = new THREE.Vector3(0.8, startY - i * CONFIG.nodeSpacing, 0);
+                                } else {
+                                    dp1 = new THREE.Vector3(startX + (i + 1) * CONFIG.nodeSpacing, -0.6, 0.8);
+                                    dp2 = new THREE.Vector3(startX + i * CONFIG.nodeSpacing, -0.6, 0.8);
+                                }
+                                const arrowPrev = createArrow(dp1, dp2, 0xaaaaaa, mobile);
+                                if (arrowPrev) listGroup.add(arrowPrev);
+                            }
+                        }
+                    }
+                }, 500);
+            }
+        }
+
+        function log(message) {
+            const logContainer = document.getElementById('log-content');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = message;
+            logContainer.prepend(entry);
+            if (logContainer.children.length > 8) logContainer.lastChild.remove();
+        }
+
+        function toggleControls() {
+            const panel = document.getElementById('controls-panel');
+            const btn = document.getElementById('show-controls-btn');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'flex';
+                btn.style.display = 'none';
+            } else {
+                panel.style.display = 'none';
+                btn.style.display = 'block';
+            }
+        }
+
+        function switchMode(mode) {
+            if (isAnimating) return;
+            currentMode = mode;
+            document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`button[onclick="switchMode('${mode}')"]`).classList.add('active');
+            log(`Switched to ${mode.charAt(0).toUpperCase() + mode.slice(1)} Linked List.`);
+            renderList();
+        }
+
+        async function handleInsert(location, valueOverride = null, indexOverride = null) {
+            if (isAnimating) return;
+            isAnimating = true;
+            const val = valueOverride !== null ? valueOverride : (parseInt(document.getElementById('data-input').value) || Math.floor(Math.random() * 100));
+            const newNode = new ListNode(val);
+            const idxInput = document.getElementById('index-input');
+            let index = 0;
+
+            if (location === 'head') {
+                index = 0;
+                log(`Inserting ${val} at Head...`);
+            }
+            else if (location === 'tail') {
+                index = nodes.length;
+                log(`Inserting ${val} at Tail...`);
+            }
+            else {
+                index = indexOverride !== null ? indexOverride : (parseInt(idxInput.value) || 0);
+                if (index < 0) index = 0;
+                if (index > nodes.length) index = nodes.length;
+                log(`Inserting ${val} at Index ${index}...`);
+            }
+
+            if (nodes.length > 0 && location === 'index') {
+                log("Traversing to position...");
+                for (let i = 0; i < index; i++) {
+                    nodes[i].highlight(CONFIG.colors.nodeHighlight);
+                    await new Promise(r => setTimeout(r, 300));
+                    nodes[i].resetColor();
+                }
+            }
+
+            nodes.splice(index, 0, newNode);
+            renderList();
+            await new Promise(r => setTimeout(r, 1000));
+            isAnimating = false;
+            return newNode;
+        }
+
+        async function handleDelete(location, indexOverride = null) {
+            if (isAnimating || nodes.length === 0) {
+                if (nodes.length === 0) log("List is empty!");
+                return null;
+            }
+            isAnimating = true;
+            let index = 0;
+            if (location === 'head') index = 0;
+            else if (location === 'tail') index = nodes.length - 1;
+            else {
+                index = indexOverride !== null ? indexOverride : (parseInt(document.getElementById('index-input').value) || 0);
+            }
+
+            if (index < 0 || index >= nodes.length) {
+                log("Index out of bounds");
+                isAnimating = false;
+                return null;
+            }
+
+            log(`Deleting node at index ${index}...`);
+            const targetNode = nodes[index];
+            targetNode.highlight(0xff0000);
+            await new Promise(r => setTimeout(r, 600));
+            new TWEEN.Tween(targetNode.mesh.scale).to({ x: 0, y: 0, z: 0 }, 400).easing(TWEEN.Easing.Back.In).start();
+            await new Promise(r => setTimeout(r, 400));
+            listGroup.remove(targetNode.mesh);
+            nodes.splice(index, 1);
+            renderList();
+            await new Promise(r => setTimeout(r, 600));
+            isAnimating = false;
+            return targetNode;
+        }
+
+        async function handleSearch(valueOverride = null) {
+            if (isAnimating || nodes.length === 0) return false;
+            isAnimating = true;
+            const val = valueOverride !== null ? valueOverride : parseInt(document.getElementById('search-input').value);
+            log(`Searching for value ${val}...`);
+            let found = false;
+            for (let i = 0; i < nodes.length; i++) {
+                nodes[i].highlight(CONFIG.colors.nodeHighlight);
+                await new Promise(r => setTimeout(r, 500));
+                if (nodes[i].value === val) {
+                    log(`Found ${val} at index ${i}!`);
+                    nodes[i].highlight(CONFIG.colors.nodeFound);
+                    found = true;
+                    setTimeout(() => nodes[i]?.resetColor(), 2000);
+                    break;
+                } else {
+                    nodes[i].resetColor();
+                }
+            }
+            if (!found) log(`${val} not found in list.`);
+            isAnimating = false;
+            return found;
+        }
+
+        async function handleReverse() {
+            if (isAnimating || nodes.length <= 1) return;
+            isAnimating = true;
+            log("Reversing list...");
+            nodes.forEach(n => n.highlight(0xffff00));
+            await new Promise(r => setTimeout(r, 500));
+            nodes.forEach(n => n.resetColor());
+            nodes.reverse();
+            renderList();
+            log("List reversed!");
+            await new Promise(r => setTimeout(r, 1000));
+            isAnimating = false;
+        }
+
+        // --- AI INTEGRATION ---
+        async function callGeminiAPI(userPrompt) {
+            const listData = nodes.map(n => n.value);
+
+            const systemPrompt = `You are an AI assistant for a 3D Linked List Visualizer. 
+Analyze the user request and return a JSON response with explanation and commands.
+
+Current State:
+- Mode: ${currentMode} (singly/doubly/circular)
+- List: ${JSON.stringify(listData)}
+- Length: ${nodes.length}
+
+Available Commands:
+- insertHead(value): Insert value at head
+- insertTail(value): Insert value at tail  
+- insertIndex(index, value): Insert value at index
+- deleteHead(): Delete head node
+- deleteTail(): Delete tail node
+- deleteIndex(index): Delete node at index
+- search(value): Search for value
+- reverse(): Reverse the list
+- clear(): Clear all nodes
+- reset(): Reset to default [10,20,30,40]
+- switchMode(mode): Switch to singly/doubly/circular
+
+IMPORTANT: Return ONLY JSON in this format:
+{
+    "explanation": "Brief explanation here",
+    "commands": [
+        {"cmd": "commandName", "args": [arg1, arg2, ...]}
+    ]
+}`;
+
+            try {
+                const response = await fetch("http://localhost:5000/api/gemini", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        userPrompt,
+                        systemPrompt
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Backend not available - using fallback");
+                }
+
+                const data = await response.json();
+                console.log("Backend response:", data);
+
+                let parsedData;
+                if (typeof data === 'string') {
+                    parsedData = JSON.parse(data);
+                } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                    const text = data.candidates[0].content.parts[0].text;
+                    parsedData = JSON.parse(text);
+                } else {
+                    parsedData = data;
+                }
+
+                return parsedData;
+
+            } catch (error) {
+                console.log("Using fallback AI response:", error);
+                return getFallbackResponse(userPrompt, listData);
+            }
+        }
+
+        function getFallbackResponse(userPrompt, listData) {
+            const prompt = userPrompt.toLowerCase();
+
+            if (prompt.includes('insert')) {
+                if (prompt.includes('head') || prompt.includes('beginning')) {
+                    const val = extractNumber(prompt) || 5;
+                    return {
+                        explanation: `**Insert at Head**: Adding value ${val} at the beginning of the linked list.`,
+                        commands: [{ "cmd": "insertHead", "args": [val] }]
+                    };
+                } else if (prompt.includes('tail') || prompt.includes('end')) {
+                    const val = extractNumber(prompt) || 50;
+                    return {
+                        explanation: `**Insert at Tail**: Adding value ${val} at the end of the linked list.`,
+                        commands: [{ "cmd": "insertTail", "args": [val] }]
+                    };
+                } else if (prompt.includes('index') || prompt.includes('position')) {
+                    const numbers = extractAllNumbers(prompt);
+                    const index = numbers[0] || 1;
+                    const val = numbers[1] || 25;
+                    return {
+                        explanation: `**Insert at Index**: Inserting value ${val} at position ${index}.`,
+                        commands: [{ "cmd": "insertIndex", "args": [index, val] }]
+                    };
+                }
+            } else if (prompt.includes('delete') || prompt.includes('remove')) {
+                if (prompt.includes('head') || prompt.includes('beginning')) {
+                    return {
+                        explanation: `**Delete Head**: Removing the first node from the linked list.`,
+                        commands: [{ "cmd": "deleteHead", "args": [] }]
+                    };
+                } else if (prompt.includes('tail') || prompt.includes('end')) {
+                    return {
+                        explanation: `**Delete Tail**: Removing the last node from the linked list.`,
+                        commands: [{ "cmd": "deleteTail", "args": [] }]
+                    };
+                } else if (prompt.includes('index') || prompt.includes('position')) {
+                    const index = extractNumber(prompt) || 1;
+                    return {
+                        explanation: `**Delete at Index**: Removing node at position ${index}.`,
+                        commands: [{ "cmd": "deleteIndex", "args": [index] }]
+                    };
+                }
+            } else if (prompt.includes('search') || prompt.includes('find')) {
+                const val = extractNumber(prompt) || 20;
+                return {
+                    explanation: `**Search**: Looking for value ${val} in the linked list using linear search.`,
+                    commands: [{ "cmd": "search", "args": [val] }]
+                };
+            } else if (prompt.includes('reverse')) {
+                return {
+                    explanation: `**Reverse**: Reversing the order of all nodes in the linked list.`,
+                    commands: [{ "cmd": "reverse", "args": [] }]
+                };
+            } else if (prompt.includes('clear') || prompt.includes('empty')) {
+                return {
+                    explanation: `**Clear**: Removing all nodes from the linked list.`,
+                    commands: [{ "cmd": "clear", "args": [] }]
+                };
+            } else if (prompt.includes('reset') || prompt.includes('default')) {
+                return {
+                    explanation: `**Reset**: Restoring linked list to default values [10, 20, 30, 40].`,
+                    commands: [{ "cmd": "reset", "args": [] }]
+                };
+            } else if (prompt.includes('singly') || prompt.includes('single')) {
+                return {
+                    explanation: `**Switch Mode**: Changing to singly linked list mode.`,
+                    commands: [{ "cmd": "switchMode", "args": ["singly"] }]
+                };
+            } else if (prompt.includes('doubly') || prompt.includes('double')) {
+                return {
+                    explanation: `**Switch Mode**: Changing to doubly linked list mode.`,
+                    commands: [{ "cmd": "switchMode", "args": ["doubly"] }]
+                };
+            } else if (prompt.includes('circular')) {
+                return {
+                    explanation: `**Switch Mode**: Changing to circular linked list mode.`,
+                    commands: [{ "cmd": "switchMode", "args": ["circular"] }]
+                };
+            }
+
+            // Default explanation
+            return {
+                explanation: `**Current State**: ${currentMode} linked list with ${nodes.length} nodes: ${JSON.stringify(listData)}`,
+                commands: []
+            };
+        }
+
+        function extractNumber(text) {
+            const match = text.match(/\d+/);
+            return match ? parseInt(match[0]) : null;
+        }
+
+        function extractAllNumbers(text) {
+            const matches = text.match(/\d+/g);
+            return matches ? matches.map(Number) : [];
+        }
+
+        async function executeAICommands(commandList) {
+            if (!commandList || !Array.isArray(commandList)) {
+                console.error("Invalid command list:", commandList);
+                return;
+            }
+
+            for (const item of commandList) {
+                const { cmd, args } = item;
+                console.log("Executing:", cmd, "with args:", args);
+
+                // Wait for animation to complete
+                while (isAnimating) {
+                    await new Promise(r => setTimeout(r, 100));
+                }
+
+                try {
+                    switch (cmd) {
+                        case 'insertHead':
+                            await handleInsert('head', args[0]);
+                            break;
+                        case 'insertTail':
+                            await handleInsert('tail', args[0]);
+                            break;
+                        case 'insertIndex':
+                            await handleInsert('index', args[1], args[0]);
+                            break;
+                        case 'deleteHead':
+                            await handleDelete('head');
+                            break;
+                        case 'deleteTail':
+                            await handleDelete('tail');
+                            break;
+                        case 'deleteIndex':
+                            await handleDelete('index', args[0]);
+                            break;
+                        case 'search':
+                            await handleSearch(args[0]);
+                            break;
+                        case 'reverse':
+                            await handleReverse();
+                            break;
+                        case 'clear':
+                            clearScene();
+                            renderList();
+                            log("List cleared");
+                            break;
+                        case 'reset':
+                            clearScene();
+                            [10, 20, 30, 40].forEach(v => nodes.push(new ListNode(v)));
+                            renderList();
+                            log("List reset to default");
+                            break;
+                        case 'switchMode':
+                            switchMode(args[0]);
+                            await new Promise(r => setTimeout(r, 500));
+                            break;
+                        default:
+                            console.warn("Unknown command:", cmd);
+                            log(`Unknown command: ${cmd}`);
+                    }
+                } catch (error) {
+                    console.error("Error executing command:", cmd, error);
+                    log(`Error executing: ${cmd}`);
+                }
+
+                await new Promise(r => setTimeout(r, 500));
+            }
+        }
+
+        async function handleAutoSimulate() {
+            if (isAnimating) return;
+
+            const prompt = document.getElementById("ai-prompt").value;
+            if (!prompt) return;
+
+            document.getElementById("ai-explanation").style.display = "block";
+            document.getElementById("ai-explanation").innerText = "Processing AI request...";
+
+            const aiResult = await callGeminiAPI(prompt);
+
+            if (!aiResult) {
+                document.getElementById("ai-explanation").innerText = "Failed to get AI response.";
+                return;
+            }
+
+            document.getElementById("ai-explanation").innerText = aiResult.explanation;
+            log(`AI: ${aiResult.explanation}`);
+
+            if (aiResult.commands && aiResult.commands.length > 0) {
+                log("Executing AI commands...");
+                await executeAICommands(aiResult.commands);
+                log("AI simulation complete");
+            }
+        }
+
+        async function handleExplainState() {
+            if (nodes.length === 0) {
+                document.getElementById('ai-explanation').innerText = "The list is empty. Nothing to explain.";
+                document.getElementById('ai-explanation').style.display = 'block';
+                return;
+            }
+            document.getElementById('ai-explanation').style.display = 'block';
+            document.getElementById('ai-explanation').innerText = `Current state: ${nodes.length} nodes. Head is ${nodes[0].value}, Tail is ${nodes[nodes.length - 1].value}. Mode: ${currentMode}`;
+        }
+
+        // --- Initialize List ---
+        [10, 20, 30, 40].forEach(v => nodes.push(new ListNode(v)));
+        renderList();
+
+        function animate(time) {
+            requestAnimationFrame(animate);
+            TWEEN.update(time);
+            controls.update();
+            nodes.forEach((node, i) => {
+                if (node.mesh) {
+                    node.mesh.rotation.y = Math.sin(time * 0.0005 + i) * 0.1;
+                    node.mesh.rotation.z = Math.cos(time * 0.0005 + i) * 0.05;
+                }
+            });
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // RESIZE HANDLER
+        window.addEventListener('resize', () => {
+            const container = document.getElementById('canvas-container');
+            if (container) {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                renderList();
+            }
+        });
+
+        // Mobile Nav Toggle
+        const navToggle = document.getElementById('nav-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        if (navToggle && navLinks) {
+            navToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                navToggle.classList.toggle('active');
+            });
+        }
+
+        // Navbar Attachment Animation
+        setTimeout(() => {
+            const navbar = document.querySelector('.navbar');
+            if (navbar) navbar.classList.add('compact');
+        }, 100);
+    </script>
+</body>
+
+</html>
