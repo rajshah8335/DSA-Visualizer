@@ -9,7 +9,7 @@ how to start the project:
 
 1) open terminal in project directory add run this following commands:-
 
-     cd backend
-     npm start
+    i)    cd backend
+   ii)    npm start
 
 2) then open index.html file in the live server.
