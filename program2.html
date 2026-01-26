@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programs | DSA Visualizer</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Background Animations -->
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar glass">
+        <a href="index.html" class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
+            <span>DSA</span>Visualizer
+        </a>
+        <div class="hamburger" id="nav-toggle">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12h18M3 6h18M3 18h18" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </div>
+        <!-- Centered Tools -->
+        <div class="nav-center">
+            <a href="linked-list.html" class="nav-link">3D Model</a>
+            <a href="theory/theory2.html" class="nav-link">Theory</a>
+            <a href="quiz2.html" class="nav-link">Quiz</a>
+            <a href="#" class="nav-link active">Program</a>
+        </div>
+
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="topics.html" class="nav-link">Topics</a>
+            <a href="#" class="nav-link">About</a>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="app-container" style="display: block; overflow-y: auto;">
+
+        <header class="topics-header">
+            <h1 class="hero-title" style="font-size: 3rem;">Explore Questions</h1>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search questions...">
+                <span class="search-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </span>
+            </div>
+        </header>
+
+        <section class="topics-grid-container">
+            <div class="topics-grid" id="topics-grid">
+                <!-- Question Cards -->
+                <a href="editor.html?data=scqdFZ6Eq6rUZgL96EVs" class="topic-card glass">
+                    <div class="topic-icon"><-></div>
+                    <h3>Detach the beginning node of the linked list.</h3>
+                    <p>hard</p>
+                </a>
+
+                <a href="editor.html?data=Rywdgm04KyChnpcJms3y" class="topic-card glass">
+                    <div class="topic-icon">O</div>
+                    <h3>Attach Node After Target in Linked List</h3>
+                    <p>medium</p>
+                </a>
+
+                <a href="editor.html?data=MFbCzf4j45tFRKCempl2" class="topic-card glass">
+                    <div class="topic-icon">M</div>
+                    <h3>Detect Cycle in a Linked List</h3>
+                    <p>hard</p>
+                </a>
+
+                <a href="editor.html?data=rZFntQxH7wB1gQSw6a2t" class="topic-card glass">
+                    <div class="topic-icon">Rx</div>
+                    <h3>search element in linked list</h3>
+                    <p>Hard</p>
+                </a>
+
+                <a href="editor.html?data=eDpVVbECMXRrTzNRvpHB" class="topic-card glass">
+                    <div class="topic-icon">Pal</div>
+                    <h3>Delete Last Node in linked list.</h3>
+                    <p>easy</p>
+                </a>
+
+                <a href="editor.html?data=QUc4WLetDN1icfP4A0N9" class="topic-card glass">
+                    <div class="topic-icon">Pal</div>
+                    <h3>Delete Target Node in linked list</h3>
+                    <p>Hard</p>
+                </a>
+
+                <!-- Coming Soon Card -->
+                <div class="topic-card glass coming-soon">
+                    <div class="topic-icon">...</div>
+                    <h3>More Scenarios</h3>
+                    <p>More practice problems coming soon.</p>
+                </div>
+            </div>
+
+            <!-- No Results Message -->
+            <div id="no-results-message" class="glass"
+                style="display: none; text-align: center; padding: 2rem; margin-top: 1rem;">
+                <h3 style="color: var(--text-secondary);">No questions found</h3>
+                <p style="margin-bottom: 0;">Try searching for "Reverse" or "Cycle"</p>
+            </div>
+        </section>
+
+    </div>
+
+    <script src="js/topics.js"></script>
+</body>
+
+</html>

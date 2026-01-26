@@ -956,7 +956,7 @@
             serializeTree(node) {
                 if (!node) return null;
                 return {
-                    value: node.value,  
+                    value: node.value,
                     x: node.x,
                     y: node.y,
                     height: node.height,
@@ -1470,6 +1470,7 @@
         // Update Node Positions (Tree Layout)
         function updatePositions(node, depth = 0, offset = 0, spread = 35) {
             if (!node) return;
+
             node.y = 10 - (depth * 5);
             node.x = offset;
 
@@ -1494,12 +1495,14 @@
                 node.mesh.material.color.setHex(color);
             }
         }
+
         function resetNodeColors(node) {
             if (!node) return;
             highlightNode(node, C_DEF);
             resetNodeColors(node.left);
             resetNodeColors(node.right);
         }
+
         function logMessage(message) {
             const logElement = document.getElementById('status-log');
             const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
