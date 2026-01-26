@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DSA Visualizer | Master Algorithms</title>
     <link rel="stylesheet" href="css/style.css">
@@ -11,9 +11,24 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5XQFN9ZZW6"></script>
+
+<!-- Google Analytics here -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-5XQFN9ZZW6');
+</script>
 </head>
 
 <body>
+
+
 
     <!-- Background Animations -->
     <div class="glow-orb orb-1"></div>
@@ -25,7 +40,7 @@
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
             </svg>
-            <span>DSA</span>Visualizer
+            <span>DSA</span>Studio
         </a>
         <div class="hamburger" id="nav-toggle">
             <span></span>
@@ -34,8 +49,9 @@
         </div>
         <div class="nav-links">
             <a href="index.html" class="nav-link active">Home</a>
+            <a href="programs.html?filter=all" class="nav-link">Problems</a>
             <a href="topics.html" target="_blank" class="nav-link">Topics</a>
-            
+
 
             <!-- Learn Dropdown (Hidden initially) -->
             <div class="nav-item dropdown" id="learn-nav-item" style="display: none; opacity: 0;">
@@ -49,45 +65,266 @@
             </div>
 
             <a href="#" class="nav-link">About</a>
-            <button id="logout" class="nav-link" style="background: none; border: none;padding: 0;margin: 0; display: none;"><i class="fa-solid fa-right-from-bracket"></i></button>
+            <button style="display: none;" id="opanprofile" class="openprofile">N</button>
         </div>
     </nav>
 
     <!-- Main Container -->
     <div class="app-container">
 
-        <!-- Landing Page Section -->
-        <section class="landing-section">
-            <h1 class="hero-title">Visualize Data Structures<br>Like Never Before</h1>
-            <p class="hero-subtitle">Interactive 3D visualizations, comprehensive theory, and real-time coding practice
-                for 6 major DSA topics. <br>Sign in to track you progress.</p>
-            <button id="get-started-btn" class="cta-button">Start Visualizing</button>
-            <button id="signin" style="margin-top: 20px; display: none;" class="cta-button">Sign In</button>
-        </section>
+        <!-- Modern Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <span class="hero-badge">Master Data Structures & Algorithms</span>
+                <h1 class="hero-title">
+                    Visualize <span class="gradient-text">Complexity</span>.<br>
+                    Code with <span class="gradient-text">Clarity</span>.
+                </h1>
+                <p class="hero-subtitle">
+                    The ultimate interactive platform to master DSA.
+                    Explore 3D visualizations, solve standard problems, and track your efficiency in real-time.
+                </p>
 
-        <!-- Visualizer Layout Section (Initially Hidden) -->
-        <section class="visualizer-container">
+                <div class="hero-actions">
+                    <button id="get-started-btn" class="cta-button primary-cta">
+                        Start Learning <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <a href="programs.html?filter=all" class="cta-button secondary-cta">
+                        View Problems
+                    </a>
+                    <button id="signin" style="display: none;" class="cta-button primary-cta">Sign In</button>
+                </div>
 
-            <!-- 3D Model Area (Placeholder for User's Code) -->
-            <div class="model-viewer">
-                <div id="three-canvas-placeholder" class="glass">
-                    <!-- USER: Inject your 3D Canvas Here -->
-                    <div style="text-align: center;">
-                        <h3>3D Model Container</h3>
-                        <p>ID: #three-canvas-placeholder</p>
-                        <p style="font-size: 0.9rem; margin-top: 10px; color: var(--accent-color);">Inject your Three.js
-                            canvas here</p>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">6+</span>
+                        <span class="stat-label">Visualizations</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">100%</span>
+                        <span class="stat-label">Interactive</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">Free</span>
+                        <span class="stat-label">For Students</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Sidebar removed as per request -->
+            <div class="hero-visual">
+                <!-- CSS-based Abstract Network/Graph Animation -->
+                <div class="network-grid">
+                    <div class="node node-1"></div>
+                    <div class="node node-2"></div>
+                    <div class="node node-3"></div>
+                    <div class="node node-4"></div>
+                    <div class="node node-5"></div>
+                    <div class="connection con-1"></div>
+                    <div class="connection con-2"></div>
+                    <div class="connection con-3"></div>
+                </div>
+
+                <!-- 3D Floating Elements -->
+                <div class="hero-3d-scene">
+                    <div class="cube-stack">
+                        <div class="cube cube-1">
+                            <div class="face front"></div>
+                            <div class="face back"></div>
+                            <div class="face right"></div>
+                            <div class="face left"></div>
+                            <div class="face top"></div>
+                            <div class="face bottom"></div>
+                        </div>
+                        <div class="cube cube-2">
+                            <div class="face front"></div>
+                            <div class="face back"></div>
+                            <div class="face right"></div>
+                            <div class="face left"></div>
+                            <div class="face top"></div>
+                            <div class="face bottom"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-code-card">
+                    <div class="code-header">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code><span class="k">function</span> <span class="f">binarySearch</span>(arr, x) {
+  <span class="k">let</span> l = 0, r = arr.length - 1;
+  <span class="k">while</span> (l <= r) {
+    <span class="k">let</span> m = l + Math.<span class="f">floor</span>((r - l) / 2);
+    <span class="c">// Visualizing step...</span>
+    <span class="k">if</span> (arr[m] == x) <span class="k">return</span> m;
+    <span class="k">if</span> (arr[m] < x) l = m + 1;
+    <span class="k">else</span> r = m - 1;
+  }
+  <span class="k">return</span> -1;
+}</code></pre>
+                    </div>
+                </div>
+            </div>
         </section>
 
+        <!-- Features Grid -->
+        <section class="features-section">
+            <h2 class="section-title">Why DSA Studio?</h2>
+            <div class="features-grid">
+                <div class="feature-card glass">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-cube"></i>
+                    </div>
+                    <h3>3D Visualization</h3>
+                    <p>Don't just read code. Watch algorithms execute step-by-step in an immersive 3D environment.</p>
+                </div>
+                <div class="feature-card glass">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <h3>Smart Editor</h3>
+                    <p>Built-in code editor (monaco/codemirror) with syntax highlighting and real-time error checking.
+                    </p>
+                </div>
+                <div class="feature-card glass">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-chart-pie"></i>
+                    </div>
+                    <h3>Progress Analytics</h3>
+                    <p>Track your solved problems, success rates, and difficulty levels with detailed charts.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Visualizer Layout Section (Initially Hidden) -->
+        <section class="visualizer-container" style="display: none;"> <!-- Hidden by default now -->
+            <!-- 3D Model Area (Placeholder for User's Code) -->
+            <div class="model-viewer">
+                <div id="three-canvas-placeholder" class="glass">
+                    <div style="text-align: center;">
+                        <h3>3D Model Container</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- animation container -->
+        <div class="animation"></div>
+
+
+    </div>
+    <div style="display: none;" class="profile" id="profile">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="12" fill="#E0E7FF" />
+            <path
+                d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z"
+                fill="#4F46E5" />
+            <path d="M12 13C7.58172 13 4 14.7909 4 17V18H20V17C20 14.7909 16.4183 13 12 13Z" fill="#4F46E5" />
+        </svg>
+        <hr>
+        <div id="closeprofile" class="closeprofile">
+            <i class="fa-solid fa-xmark"></i>
+        </div>
+        <h3 id="profileemail">E</h3>
+        <h4 id="profilename"> xyz</h4>
+        <h4 id="profilenumber">0</h4>
+        <h4 id="profiledob">0</h4>
+        <h4 id="profileaddress">none</h4>
+        <h4 id="profileprofesstion">none</h4>
+        <h4 id="profilesubmitted">none</h4>
+        <h4 style="color: gold; cursor: pointer;" id="opananalatics">none</h4>
+        <button style="margin: auto; display: block;" id="signout" class="button"><i
+                class="fa-solid fa-arrow-right-from-bracket"></i>
+            Sign out</button>
+    </div>
+
+    <!-- Enter profile informaiotn -->
+
+
+    <div style="display: none;" id="enterprifilecon" class="enterprifilecon">
+        <div class="profile-form">
+
+            <div class="svg-box">
+                <svg style="width: 20%;" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="12" y="8" width="40" height="48" rx="4" fill="#F3F4F6" stroke="#374151" stroke-width="2" />
+                    <circle cx="32" cy="24" r="8" fill="#D1D5DB" stroke="#374151" stroke-width="2" />
+                    <rect x="20" y="38" width="24" height="4" rx="2" fill="#9CA3AF" />
+                    <rect x="20" y="46" width="16" height="4" rx="2" fill="#9CA3AF" />
+                    <circle cx="48" cy="52" r="10" fill="#10B981" />
+                    <path d="M44 52L47 55L52 49" stroke="white" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </div>
+
+            <h2>Complete Your Profile</h2>
+            <p>Please fill in the information below</p>
+
+            <form>
+
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="username" placeholder="Enter full name">
+                </div>
+
+                <div class="input-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="userphonenumber" placeholder="Enter phone number">
+                </div>
+
+                <div class="input-group">
+                    <label>Date of Birth</label>
+                    <input type="date" id="userdob">
+                </div>
+
+                <div class="input-group">
+                    <label>Address</label>
+                    <textarea placeholder="Enter address" id="useraddress"></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>Profession</label>
+                    <input type="text" id="userprofession" placeholder="Enter profession">
+                </div>
+
+                <div class="form-actions">
+                    <button style="margin: auto;" class="button" id="saveprofile">Save</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    <div style="display: none;" class="note" id="note">
+        <h2><b>NOTE</b></h2>
+        <h1 id="noteh1">..</h1>
+        <button style="margin: auto;" class="button" id="colsenote">OK</button>
+    </div>
+    <div id="loadcon" style="display: none;" class="loadcon">
+        <iframe src="https://lottie.host/embed/dd531f70-df09-42c5-b82e-85c1059e5edd/GR2mqQZtk8.lottie"></iframe>
+    </div>
+
+
+    <!-- analytics -->
+
+    <div style="display: none;" id="analyticscon" class="analyticscon">
+        <div class="chart">
+            <canvas id="unsolvedsolvedchart"></canvas>
+        </div>
+        <div class="chart">
+            <canvas id="varieyofquestoin"></canvas>
+        </div>
+        <div class="chart">
+            <canvas id="successrate"></canvas>
+        </div>
+        <div class="chart">
+            <canvas id="successandfail"></canvas>
+        </div>
     </div>
 
     <script src="js/main.js"></script>
     <script type="module" src="js/index.js"></script>
+    <script src="js/anime.js"></script>
 </body>
 
 </html>

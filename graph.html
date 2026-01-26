@@ -453,7 +453,7 @@
     <nav class="navbar">
         <a href="index.html" class="logo">
             <i data-lucide="zap" class="w-6 h-6 text-blue-500"></i>
-            <span>DSA</span>Visualizer
+            <span>DSA</span>Studio
         </a>
         <div class="hamburger" id="nav-toggle">
             <span></span>
@@ -625,39 +625,10 @@
         // --- 3D Graph Logic with AI Integration ---
         let isAnimating = false;
         let lastLogMessage = "Ready.";
-        const container = document.getElementById('canvas-container');
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0f172a);
-        scene.fog = new THREE.Fog(0x0f172a, 20, 100);
-
-        const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
-        camera.position.set(0, 10, window.innerWidth < 768 ? 45 : 30);
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.shadowMap.enabled = true;
-        container.appendChild(renderer.domElement);
-
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-
-        // Lights
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        scene.add(ambientLight);
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-        dirLight.position.set(10, 20, 10);
-        dirLight.castShadow = true;
-        scene.add(dirLight);
-
-        const gridHelper = new THREE.GridHelper(50, 50, 0x334155, 0x1e293b);
-        gridHelper.position.y = -10;
-        scene.add(gridHelper);
-
-        // Graph Data
-        const NODES = [];
-        const EDGES = [];
-        const ADJ_LIST = {};
+        let scene, camera, renderer, controls;
+        let NODES = [];
+        let EDGES = [];
+        let ADJ_LIST = {};
 
         // Colors and Materials
         const colors = {
@@ -916,12 +887,18 @@
                 scene.remove(n.mesh);
                 if (n.mesh.geometry) n.mesh.geometry.dispose();
                 if (n.mesh.material) n.mesh.material.dispose();
+                if (n.sprite && n.sprite.material && n.sprite.material.map) {
+                    n.sprite.material.map.dispose();
+                }
             });
 
             EDGES.forEach(e => {
                 scene.remove(e.mesh);
                 if (e.mesh.geometry) e.mesh.geometry.dispose();
                 if (e.mesh.material) e.mesh.material.dispose();
+                if (e.weightLabel && e.weightLabel.material && e.weightLabel.material.map) {
+                    e.weightLabel.material.map.dispose();
+                }
             });
 
             // Clear arrays
@@ -993,7 +970,7 @@
             isAnimating = false;
         }
 
-        // --- AI Integration (Same pattern as queue.html) ---
+        // --- AI Integration ---
         async function callGeminiAPI(userPrompt) {
             const stateData = {
                 nodes: NODES.map(n => n.id),
@@ -1410,14 +1387,39 @@ IMPORTANT: Return ONLY JSON in this format:
             }, 100);
         }
 
-        // Event Listeners
-        window.addEventListener('resize', () => {
-            const c = document.getElementById('canvas-container');
-            camera.aspect = c.clientWidth / c.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(c.clientWidth, c.clientHeight);
-        });
+        // Initialize Three.js scene
+        function initThreeJS() {
+            const container = document.getElementById('canvas-container');
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0f172a);
+            scene.fog = new THREE.Fog(0x0f172a, 20, 100);
 
+            camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(0, 10, window.innerWidth < 768 ? 45 : 30);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.shadowMap.enabled = true;
+            container.appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+            dirLight.position.set(10, 20, 10);
+            dirLight.castShadow = true;
+            scene.add(dirLight);
+
+            const gridHelper = new THREE.GridHelper(50, 50, 0x334155, 0x1e293b);
+            gridHelper.position.y = -10;
+            scene.add(gridHelper);
+        }
+
+        // Animation loop
         function animate() {
             requestAnimationFrame(animate);
             updatePhysics();
@@ -1427,36 +1429,108 @@ IMPORTANT: Return ONLY JSON in this format:
 
         // Initialize everything
         function init() {
+            // Initialize Three.js
+            initThreeJS();
+
+            // Initialize default graph
             initDefaultGraph();
-            lucide.createIcons();
-            animate();
+
+            // Initialize icons
+            if (window.lucide) {
+                lucide.createIcons();
+            }
 
             // Setup AI prompt enter key
-            document.getElementById('ai-prompt').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    askGeminiAction();
+            const aiPromptInput = document.getElementById('ai-prompt');
+            if (aiPromptInput) {
+                aiPromptInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        askGeminiAction();
+                    }
+                });
+            }
+
+            // Setup node input enter key
+            const nodeInput = document.getElementById('node-label');
+            if (nodeInput) {
+                nodeInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addNodeFromUI();
+                    }
+                });
+            }
+
+            // Start animation loop
+            animate();
+
+            // Set initial UI state
+            const panel = document.getElementById('ui-content');
+            const showBtn = document.getElementById('show-btn');
+            if (panel && showBtn) {
+                panel.style.display = 'block';
+                showBtn.classList.add('hidden');
+            }
+        }
+
+        // Event Listeners
+        function setupEventListeners() {
+            // Window resize
+            window.addEventListener('resize', () => {
+                const c = document.getElementById('canvas-container');
+                if (c && camera && renderer) {
+                    camera.aspect = c.clientWidth / c.clientHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(c.clientWidth, c.clientHeight);
                 }
             });
+
+            // Mobile Nav Toggle
+            const navToggle = document.getElementById('nav-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            if (navToggle && navLinks) {
+                navToggle.addEventListener('click', () => {
+                    navLinks.classList.toggle('active');
+                    navToggle.classList.toggle('active');
+                });
+            }
+
+            // Navbar Attachment Animation
+            setTimeout(() => {
+                const navbar = document.querySelector('.navbar');
+                if (navbar) navbar.classList.add('compact');
+            }, 100);
         }
 
-        // Mobile Nav Toggle
-        const navToggle = document.getElementById('nav-toggle');
-        const navLinks = document.querySelector('.nav-links');
-        if (navToggle && navLinks) {
-            navToggle.addEventListener('click', () => {
-                navLinks.classList.toggle('active');
-                navToggle.classList.toggle('active');
+        // Clean up function
+        function cleanup() {
+            resetGraph();
+
+            // Dispose of materials
+            Object.values(nodeMaterials).forEach(material => {
+                if (material && material.dispose) material.dispose();
             });
+
+            if (nodeGeometry && nodeGeometry.dispose) nodeGeometry.dispose();
+
+            // Remove event listeners
+            window.removeEventListener('resize', setupEventListeners);
         }
 
-        // Navbar Attachment Animation
-        setTimeout(() => {
-            const navbar = document.querySelector('.navbar');
-            if (navbar) navbar.classList.add('compact');
-        }, 100);
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            try {
+                init();
+                setupEventListeners();
+            } catch (error) {
+                console.error("Error initializing graph visualization:", error);
+                log("Failed to initialize graph visualization", 'error');
+            }
+        });
 
-        // Initialize the application
-        init();
+        // Clean up on page unload
+        window.addEventListener('beforeunload', cleanup);
     </script>
 </body>
 

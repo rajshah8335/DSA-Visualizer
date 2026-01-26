@@ -372,7 +372,7 @@
     <nav class="navbar">
         <a href="index.html" class="logo">
             <i data-lucide="zap" class="w-6 h-6 text-blue-500"></i>
-            <span>DSA</span>Visualizer
+            <span>DSA</span>Studio
         </a>
         <div class="hamburger" id="nav-toggle">
             <span></span>
@@ -579,8 +579,12 @@ int main() {
             const modals = document.querySelectorAll('.modal');
             modals.forEach(m => m.classList.remove('active-modal'));
             const target = document.getElementById('modal-' + type);
-            if (target) { overlay.classList.add('active'); target.classList.add('active-modal'); }
+            if (target) {
+                overlay.classList.add('active');
+                target.classList.add('active-modal');
+            }
         }
+
         function closeModals() {
             document.getElementById('modal-overlay').classList.remove('active');
             document.querySelectorAll('.modal').forEach(m => m.classList.remove('active-modal'));
@@ -604,32 +608,51 @@ int main() {
         function toggleAiPanel() {
             const content = document.getElementById('ai-panel-content');
             const icon = document.getElementById('ai-toggle-icon');
-            if (content.style.maxHeight === '0px') {
-                content.style.maxHeight = '300px'; content.style.opacity = '1'; content.style.marginTop = '0.5rem';
+            if (content.style.maxHeight === '0px' || content.style.maxHeight === '') {
+                content.style.maxHeight = '300px';
+                content.style.opacity = '1';
+                content.style.marginTop = '0.5rem';
                 icon.style.transform = 'rotate(180deg)';
             } else {
-                content.style.maxHeight = '0px'; content.style.opacity = '0'; content.style.marginTop = '0';
+                content.style.maxHeight = '0px';
+                content.style.opacity = '0';
+                content.style.marginTop = '0';
                 icon.style.transform = 'rotate(0deg)';
             }
         }
 
-        const isMobile = () => window.innerWidth < 768;
-
         class QueueApp {
             constructor() {
-                this.scene = null; this.camera = null; this.renderer = null; this.controls = null;
-                this.animationId = null; this.isProcessingAI = false;
+                this.scene = null;
+                this.camera = null;
+                this.renderer = null;
+                this.controls = null;
+                this.animationId = null;
+                this.isProcessingAI = false;
                 this.isAnimating = false;
 
                 this.colors = {
-                    front: '#22d3ee', rear: '#fb7185', slot: '#1e293b', slotBorder: '#475569',
-                    item: '#6366f1', itemEmissive: '#4338ca', text: '#94a3b8',
-                    highlight: '#fbbf24', success: '#10b981', error: '#ef4444'
+                    front: '#22d3ee',
+                    rear: '#fb7185',
+                    slot: '#1e293b',
+                    slotBorder: '#475569',
+                    item: '#6366f1',
+                    itemEmissive: '#4338ca',
+                    text: '#94a3b8',
+                    highlight: '#fbbf24',
+                    success: '#10b981',
+                    error: '#ef4444'
                 };
-                this.mode = 'simple'; this.size = 8;
+
+                this.mode = 'simple';
+                this.size = 8;
                 this.items = new Array(this.size).fill(null);
-                this.front = -1; this.rear = -1;
-                this.slots = []; this.frontMarker = null; this.rearMarker = null; this.group = new THREE.Group();
+                this.front = -1;
+                this.rear = -1;
+                this.slots = [];
+                this.frontMarker = null;
+                this.rearMarker = null;
+                this.group = new THREE.Group();
 
                 this.init();
             }
@@ -676,25 +699,46 @@ int main() {
                 this.onWindowResize = this.onWindowResize.bind(this);
                 window.addEventListener('resize', this.onWindowResize, false);
                 this.animate();
+
+                // Update UI initially
+                this.updateUI();
             }
 
             createPointer(text, colorHex) {
                 const group = new THREE.Group();
                 const canvas = document.createElement('canvas');
-                canvas.width = 256; canvas.height = 128;
+                canvas.width = 256;
+                canvas.height = 128;
                 const ctx = canvas.getContext('2d');
-                ctx.shadowColor = colorHex; ctx.shadowBlur = 20; ctx.fillStyle = colorHex;
+                ctx.shadowColor = colorHex;
+                ctx.shadowBlur = 20;
+                ctx.fillStyle = colorHex;
 
                 const x = 20, y = 20, w = 216, h = 88, r = 44;
                 ctx.beginPath();
-                ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r);
-                ctx.closePath(); ctx.fill();
+                ctx.moveTo(x + r, y);
+                ctx.arcTo(x + w, y, x + w, y + h, r);
+                ctx.arcTo(x + w, y + h, x, y + h, r);
+                ctx.arcTo(x, y + h, x, y, r);
+                ctx.arcTo(x, y, x + w, y, r);
+                ctx.closePath();
+                ctx.fill();
 
-                ctx.shadowBlur = 0; ctx.font = 'bold 50px "Inter", sans-serif'; ctx.fillStyle = '#0f172a';
-                ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, 128, 64);
+                ctx.shadowBlur = 0;
+                ctx.font = 'bold 50px "Inter", sans-serif';
+                ctx.fillStyle = '#0f172a';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(text, 128, 64);
 
-                const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(canvas), transparent: true }));
-                sprite.position.y = 1.3; sprite.scale.set(1.5, 0.75, 1);
+                const sprite = new THREE.Sprite(
+                    new THREE.SpriteMaterial({
+                        map: new THREE.CanvasTexture(canvas),
+                        transparent: true
+                    })
+                );
+                sprite.position.y = 1.3;
+                sprite.scale.set(1.5, 0.75, 1);
                 group.add(sprite);
                 group.visible = false;
                 return group;
@@ -702,18 +746,32 @@ int main() {
 
             setMode(newMode) {
                 if (this.mode === newMode) return;
-                document.getElementById('btn-simple').className = newMode === 'simple' ? "btn-glass active flex-1 py-2 px-3 rounded-lg text-xs font-semibold" : "btn-glass flex-1 py-2 px-3 rounded-lg text-xs font-semibold";
-                document.getElementById('btn-circular').className = newMode === 'circular' ? "btn-glass active flex-1 py-2 px-3 rounded-lg text-xs font-semibold" : "btn-glass flex-1 py-2 px-3 rounded-lg text-xs font-semibold";
-                this.mode = newMode; this.reset(); this.buildGrid();
+
+                document.getElementById('btn-simple').className = newMode === 'simple'
+                    ? "btn-glass active flex-1 py-2 px-3 rounded-lg text-xs font-semibold"
+                    : "btn-glass flex-1 py-2 px-3 rounded-lg text-xs font-semibold";
+
+                document.getElementById('btn-circular').className = newMode === 'circular'
+                    ? "btn-glass active flex-1 py-2 px-3 rounded-lg text-xs font-semibold"
+                    : "btn-glass flex-1 py-2 px-3 rounded-lg text-xs font-semibold";
+
+                this.mode = newMode;
+                this.reset();
+                this.buildGrid();
                 this.updateStatus(`Switched to ${newMode} queue mode`, 'normal');
             }
 
             updateSize() {
                 const input = document.getElementById('queue-size');
                 let newSize = parseInt(input.value);
-                if (isNaN(newSize) || newSize < 3) newSize = 3; if (newSize > 20) newSize = 20;
+                if (isNaN(newSize) || newSize < 3) newSize = 3;
+                if (newSize > 20) newSize = 20;
                 input.value = newSize;
-                if (this.size !== newSize) { this.size = newSize; this.reset(); this.buildGrid(); }
+                if (this.size !== newSize) {
+                    this.size = newSize;
+                    this.reset();
+                    this.buildGrid();
+                }
                 this.updateStatus(`Queue size set to ${newSize}`, 'normal');
             }
 
@@ -727,19 +785,22 @@ int main() {
                         if (i.material) i.material.dispose();
                     }
                 });
+
                 this.items = new Array(this.size).fill(null);
-                this.front = -1; this.rear = -1;
-                this.updateMarkers(); this.updateUI();
+                this.front = -1;
+                this.rear = -1;
+                this.updateMarkers();
+                this.updateUI();
             }
 
             buildGrid() {
+                // Remove old slots
                 this.slots.forEach(s => {
                     this.group.remove(s);
                     if (s.geometry) s.geometry.dispose();
                     if (s.material) s.material.dispose();
                 });
                 this.slots = [];
-                const mobile = false;
 
                 if (this.mode === 'simple') {
                     const startX = -((this.size * 1.2) / 2) + 0.6;
@@ -748,10 +809,11 @@ int main() {
                         slot.position.set(startX + i * 1.2, 0, 0);
                         const sprite = slot.children.find(c => c.type === 'Sprite');
                         if (sprite) sprite.position.set(0, 0.15, 0.6);
-                        this.group.add(slot); this.slots.push(slot);
+                        this.group.add(slot);
+                        this.slots.push(slot);
                     }
                 } else {
-                    const radius = Math.max(mobile ? 2.0 : 2.5, (this.size * 1.2) / (2 * Math.PI));
+                    const radius = Math.max(2.5, (this.size * 1.2) / (2 * Math.PI));
                     for (let i = 0; i < this.size; i++) {
                         const angle = (i / this.size) * Math.PI * 2;
                         const slot = this.createSlot(i);
@@ -759,27 +821,57 @@ int main() {
                         slot.lookAt(0, 0, 0);
                         const sprite = slot.children.find(c => c.type === 'Sprite');
                         if (sprite) sprite.position.set(0, 0.15, -0.6);
-                        this.group.add(slot); this.slots.push(slot);
+                        this.group.add(slot);
+                        this.slots.push(slot);
                     }
                 }
+
                 this.updateMarkers();
             }
 
             createSlot(index) {
                 const wrapper = new THREE.Group();
-                const floor = new THREE.Mesh(new THREE.BoxGeometry(1, 0.05, 1), new THREE.MeshStandardMaterial({ color: this.colors.slot }));
-                floor.position.y = -0.025; floor.receiveShadow = true; wrapper.add(floor);
 
-                const edges = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(1, 1)), new THREE.LineBasicMaterial({ color: this.colors.slotBorder, opacity: 0.5, transparent: true }));
-                edges.rotation.x = -Math.PI / 2; edges.position.y = 0.01; wrapper.add(edges);
+                // Floor
+                const floor = new THREE.Mesh(
+                    new THREE.BoxGeometry(1, 0.05, 1),
+                    new THREE.MeshStandardMaterial({ color: this.colors.slot })
+                );
+                floor.position.y = -0.025;
+                floor.receiveShadow = true;
+                wrapper.add(floor);
 
-                const canvas = document.createElement('canvas'); canvas.width = 128; canvas.height = 128;
+                // Border edges
+                const edges = new THREE.LineSegments(
+                    new THREE.EdgesGeometry(new THREE.PlaneGeometry(1, 1)),
+                    new THREE.LineBasicMaterial({
+                        color: this.colors.slotBorder,
+                        opacity: 0.5,
+                        transparent: true
+                    })
+                );
+                edges.rotation.x = -Math.PI / 2;
+                edges.position.y = 0.01;
+                wrapper.add(edges);
+
+                // Index label
+                const canvas = document.createElement('canvas');
+                canvas.width = 128;
+                canvas.height = 128;
                 const ctx = canvas.getContext('2d');
-                ctx.font = 'bold 80px "JetBrains Mono", monospace'; ctx.fillStyle = '#94a3b8'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.font = 'bold 80px "JetBrains Mono", monospace';
+                ctx.fillStyle = '#94a3b8';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
                 ctx.fillText(index.toString(), 64, 64);
 
-                const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(canvas) }));
-                sprite.position.set(0, 0.5, 0); sprite.scale.set(0.6, 0.6, 0.6); wrapper.add(sprite);
+                const sprite = new THREE.Sprite(
+                    new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(canvas) })
+                );
+                sprite.position.set(0, 0.5, 0);
+                sprite.scale.set(0.6, 0.6, 0.6);
+                wrapper.add(sprite);
+
                 return wrapper;
             }
 
@@ -791,6 +883,7 @@ int main() {
                 let val = value !== null ? value : (input.value !== '' ? parseInt(input.value) : null);
                 input.value = '';
 
+                // Check for overflow
                 if (this.mode === 'simple') {
                     if (this.rear === this.size - 1) {
                         this.updateStatus('Queue Overflow', 'error');
@@ -800,6 +893,7 @@ int main() {
                     if (this.front === -1) this.front = 0;
                     this.rear++;
                 } else {
+                    // Circular queue
                     if ((this.rear + 1) % this.size === this.front) {
                         this.updateStatus('Buffer Full', 'error');
                         this.isAnimating = false;
@@ -828,13 +922,23 @@ int main() {
 
                 await this.removeItemWithAnimation(this.front);
 
+                // Update indices
                 if (this.mode === 'simple') {
-                    if (this.front === this.rear) { this.front = -1; this.rear = -1; }
-                    else { this.front++; }
+                    if (this.front === this.rear) {
+                        this.front = -1;
+                        this.rear = -1;
+                    } else {
+                        this.front++;
+                    }
                 } else {
-                    if (this.front === this.rear) { this.front = -1; this.rear = -1; }
-                    else { this.front = (this.front + 1) % this.size; }
+                    if (this.front === this.rear) {
+                        this.front = -1;
+                        this.rear = -1;
+                    } else {
+                        this.front = (this.front + 1) % this.size;
+                    }
                 }
+
                 this.updateMarkers();
                 this.updateUI();
                 this.updateStatus(`Dequeued front element`, 'normal');
@@ -855,8 +959,10 @@ int main() {
                         })
                     );
 
+                    // Create value texture
                     const canvas = document.createElement('canvas');
-                    canvas.width = 128; canvas.height = 128;
+                    canvas.width = 128;
+                    canvas.height = 128;
                     const ctx = canvas.getContext('2d');
                     ctx.font = 'bold 80px "JetBrains Mono", monospace';
                     ctx.fillStyle = '#fff';
@@ -864,13 +970,16 @@ int main() {
                     ctx.textBaseline = 'middle';
                     ctx.fillText(value.toString(), 64, 64);
 
-                    const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-                        map: new THREE.CanvasTexture(canvas)
-                    }));
+                    const sprite = new THREE.Sprite(
+                        new THREE.SpriteMaterial({
+                            map: new THREE.CanvasTexture(canvas)
+                        })
+                    );
                     sprite.position.y = 0.35;
                     sprite.scale.set(0.6, 0.6, 0.6);
                     block.add(sprite);
 
+                    // Position above slot
                     const slot = this.slots[index];
                     block.position.copy(slot.position);
                     block.rotation.copy(slot.rotation);
@@ -879,11 +988,11 @@ int main() {
                     this.group.add(block);
                     this.items[index] = block;
 
-                    // Animate drop
-                    let targetY = 0.15, vel = 0;
+                    // Drop animation
+                    let targetY = 0.15, velocity = 0;
                     const animateDrop = () => {
-                        vel += 0.03;
-                        block.position.y -= vel;
+                        velocity += 0.03;
+                        block.position.y -= velocity;
                         if (block.position.y <= targetY) {
                             block.position.y = targetY;
                             resolve();
@@ -898,26 +1007,31 @@ int main() {
             async removeItemWithAnimation(index) {
                 return new Promise(resolve => {
                     const item = this.items[index];
-                    if (item) {
-                        let lift = 0.05;
-                        const animateRemove = () => {
-                            item.position.y += lift;
-                            lift += 0.01;
-                            item.scale.multiplyScalar(0.9);
-                            if (item.scale.x > 0.01) {
-                                requestAnimationFrame(animateRemove);
-                            } else {
-                                this.group.remove(item);
-                                item.geometry.dispose();
-                                item.material.dispose();
-                                this.items[index] = null;
-                                resolve();
-                            }
-                        };
-                        animateRemove();
-                    } else {
+                    if (!item) {
                         resolve();
+                        return;
                     }
+
+                    let lift = 0.05;
+                    const animateRemove = () => {
+                        item.position.y += lift;
+                        lift += 0.01;
+                        item.scale.multiplyScalar(0.9);
+
+                        if (item.scale.x > 0.01) {
+                            requestAnimationFrame(animateRemove);
+                        } else {
+                            this.group.remove(item);
+                            if (item.geometry) item.geometry.dispose();
+                            if (item.material) item.material.dispose();
+                            if (item.children[0] && item.children[0].material && item.children[0].material.map) {
+                                item.children[0].material.map.dispose();
+                            }
+                            this.items[index] = null;
+                            resolve();
+                        }
+                    };
+                    animateRemove();
                 });
             }
 
@@ -927,14 +1041,17 @@ int main() {
                     this.rearMarker.visible = false;
                     return;
                 }
+
                 this.frontMarker.visible = true;
                 this.rearMarker.visible = true;
 
+                // Position front marker
                 const fTarget = this.slots[this.front].position.clone();
                 fTarget.y = 0;
                 if (this.front === this.rear) fTarget.x -= 0.35;
                 this.frontMarker.userData.target = fTarget;
 
+                // Position rear marker
                 const rTarget = this.slots[this.rear].position.clone();
                 rTarget.y = 0;
                 if (this.front === this.rear) rTarget.x += 0.35;
@@ -955,7 +1072,7 @@ int main() {
                     }`;
             }
 
-            // --- AI INTEGRATION (Similar to array.html) ---
+            // --- AI INTEGRATION ---
             async callGeminiAPI(userPrompt) {
                 const stateData = {
                     mode: this.mode,
@@ -1165,14 +1282,15 @@ IMPORTANT: Return ONLY JSON in this format:
             }
 
             async processAiPrompt() {
-                const prompt = document.getElementById('ai-prompt').value.trim();
+                const promptInput = document.getElementById('ai-prompt');
+                const prompt = promptInput.value.trim();
                 if (!prompt) {
                     this.updateStatus("Please enter an AI command", 'error');
                     return;
                 }
 
                 // Clear input
-                document.getElementById('ai-prompt').value = '';
+                promptInput.value = '';
 
                 this.showAIOutput("Processing your request...", true);
                 this.updateStatus("AI processing...", 'normal');
@@ -1240,19 +1358,39 @@ IMPORTANT: Return ONLY JSON in this format:
                     cancelAnimationFrame(this.animationId);
                 }
                 window.removeEventListener('resize', this.onWindowResize);
+
+                // Clean up Three.js objects
+                this.slots.forEach(slot => {
+                    if (slot.geometry) slot.geometry.dispose();
+                    if (slot.material) slot.material.dispose();
+                });
+
+                this.items.forEach(item => {
+                    if (item) {
+                        if (item.geometry) item.geometry.dispose();
+                        if (item.material) item.material.dispose();
+                    }
+                });
             }
         }
 
         // Initialize the app
         let app;
-        window.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', () => {
+            // Clean up previous app if exists
             if (window.app) {
                 window.app.dispose();
                 window.app = null;
             }
+
+            // Create new app
             app = new QueueApp();
             window.app = app;
-            lucide.createIcons();
+
+            // Initialize icons
+            if (window.lucide) {
+                lucide.createIcons();
+            }
 
             // Mobile Nav Toggle
             const navToggle = document.getElementById('nav-toggle');
@@ -1271,11 +1409,52 @@ IMPORTANT: Return ONLY JSON in this format:
             }, 100);
 
             // AI prompt enter key support
-            document.getElementById('ai-prompt').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    app.processAiPrompt();
-                }
-            });
+            const aiPromptInput = document.getElementById('ai-prompt');
+            if (aiPromptInput) {
+                aiPromptInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        app.processAiPrompt();
+                    }
+                });
+            }
+
+            // Enqueue input enter key support
+            const enqueueInput = document.getElementById('enqueue-val');
+            if (enqueueInput) {
+                enqueueInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        app.enqueue();
+                    }
+                });
+            }
+
+            // Queue size input enter key support
+            const sizeInput = document.getElementById('queue-size');
+            if (sizeInput) {
+                sizeInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        app.updateSize();
+                    }
+                });
+            }
+
+            // Auto-open AI panel on mobile
+            if (window.innerWidth < 768) {
+                setTimeout(() => {
+                    toggleAiPanel();
+                }, 1000);
+            }
+        });
+
+        // Clean up on page unload
+        window.addEventListener('beforeunload', () => {
+            if (window.app) {
+                window.app.dispose();
+                window.app = null;
+            }
         });
     </script>
 </body>

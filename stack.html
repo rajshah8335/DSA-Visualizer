@@ -422,7 +422,7 @@
     <nav class="navbar">
         <a href="index.html" class="logo">
             <i data-lucide="zap" class="w-6 h-6 text-blue-500"></i>
-            <span>DSA</span>Visualizer
+            <span>DSA</span>Studio
         </a>
         <div class="hamburger" id="nav-toggle">
             <span></span>
@@ -568,7 +568,6 @@ int main() {
 
     <script>
         // --- Modal Logic ---
-        // --- Modal Logic ---
         function openModal(type) {
             const overlay = document.getElementById('modal-overlay');
             const modals = document.querySelectorAll('.modal');
@@ -588,7 +587,7 @@ int main() {
         function toggleUI() {
             const ui = document.querySelector('.controls-container');
             const btn = document.getElementById('show-btn');
-            if (ui.style.display === 'none') {
+            if (ui.style.display === 'none' || ui.style.display === '') {
                 ui.style.display = 'flex';
                 btn.classList.add('hidden');
             } else {
@@ -661,13 +660,13 @@ int main() {
             // Events
             window.addEventListener('resize', onWindowResize, false);
 
-            animate();
-
-            // Create initial demo elements
+            // Create platform and initial demo
+            createPlatform();
             setTimeout(() => pushToStack(10), 500);
             setTimeout(() => pushToStack(20), 1000);
 
-            createPlatform();
+            animate();
+            onWindowResize(); // Initial resize
         }
 
         function createPlatform() {
@@ -747,10 +746,8 @@ int main() {
             const mesh = new THREE.Mesh(geo, mat);
 
             if (animateFromTop) {
-                // Animate from above
                 mesh.position.set(0, 20, 0);
             } else {
-                // Instant appear at position (for batch operations)
                 mesh.position.set(0, targetY, 0);
                 mesh.scale.set(0.1, 0.1, 0.1);
             }
@@ -762,15 +759,12 @@ int main() {
             stack.push({ value: value, mesh: mesh, targetY: targetY });
 
             if (animateFromTop) {
-                // Animate falling into place
                 const duration = 800;
                 const startTime = Date.now();
 
                 function animatePush() {
                     const elapsed = Date.now() - startTime;
                     const progress = Math.min(elapsed / duration, 1);
-
-                    // Ease out function
                     const ease = 1 - Math.pow(1 - progress, 3);
 
                     mesh.position.y = 20 + (targetY - 20) * ease;
@@ -785,7 +779,6 @@ int main() {
 
                 requestAnimationFrame(animatePush);
             } else {
-                // Scale animation
                 new TWEEN.Tween(mesh.scale)
                     .to({ x: 1, y: 1, z: 1 }, 500)
                     .easing(TWEEN.Easing.Elastic.Out)
@@ -817,7 +810,6 @@ int main() {
                 const elapsed = Date.now() - startTime;
                 const progress = Math.min(elapsed / popDuration, 1);
 
-                // Fly up and fade out
                 item.mesh.position.y = startY + 15 * progress;
                 item.mesh.rotation.y += 0.1;
                 item.mesh.material.opacity = 1 - progress;
@@ -872,7 +864,6 @@ int main() {
             if (isAnimating) return;
             isAnimating = true;
 
-            // Animate removing all elements
             if (stack.length === 0) {
                 logMessage("Stack is already empty");
                 isAnimating = false;
@@ -881,11 +872,12 @@ int main() {
 
             logMessage("Clearing stack...");
 
-            // Animate removal of all elements
+            // Create a copy of the stack array
+            const itemsToRemove = [...stack];
             let removed = 0;
 
             function removeNext() {
-                if (removed >= stack.length) {
+                if (removed >= itemsToRemove.length) {
                     stack = [];
                     updateUI();
                     isAnimating = false;
@@ -893,7 +885,7 @@ int main() {
                     return;
                 }
 
-                const item = stack[stack.length - 1 - removed];
+                const item = itemsToRemove[removed];
                 const startTime = Date.now();
                 const duration = 300;
 
@@ -1236,32 +1228,50 @@ IMPORTANT: Return ONLY JSON in this format:
 
         function onWindowResize() {
             const container = document.getElementById('canvas-container');
-            if (container) {
+            if (container && camera && renderer) {
                 camera.aspect = container.clientWidth / container.clientHeight;
                 camera.updateProjectionMatrix();
                 renderer.setSize(container.clientWidth, container.clientHeight);
             }
         }
 
-        // Initialize
-        init();
-        lucide.createIcons();
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize 3D visualization
+            if (document.getElementById('canvas-container')) {
+                init();
+            }
 
-        // Mobile Nav Toggle
-        const navToggle = document.getElementById('nav-toggle');
-        const navLinks = document.querySelector('.nav-links');
-        if (navToggle && navLinks) {
-            navToggle.addEventListener('click', () => {
-                navLinks.classList.toggle('active');
-                navToggle.classList.toggle('active');
-            });
-        }
+            // Initialize icons
+            if (window.lucide) {
+                lucide.createIcons();
+            }
 
-        // Navbar Attachment Animation
-        setTimeout(() => {
-            const navbar = document.querySelector('.navbar');
-            if (navbar) navbar.classList.add('compact');
-        }, 100);
+            // Setup event listeners
+            const pushInput = document.getElementById('push-value');
+            if (pushInput) {
+                pushInput.addEventListener('keypress', handleEnter);
+            }
+
+            // Set initial UI state
+            toggleUI(); // Show controls by default
+
+            // Setup mobile nav toggle
+            const navToggle = document.getElementById('nav-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            if (navToggle && navLinks) {
+                navToggle.addEventListener('click', () => {
+                    navLinks.classList.toggle('active');
+                    navToggle.classList.toggle('active');
+                });
+            }
+
+            // Navbar attachment animation
+            setTimeout(() => {
+                const navbar = document.querySelector('.navbar');
+                if (navbar) navbar.classList.add('compact');
+            }, 100);
+        });
     </script>
 </body>
 

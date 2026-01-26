@@ -241,9 +241,108 @@
             background: transparent;
         }
 
-        .ui-panel::-webkit-scrollbar-thumb {
-            background: rgba(148, 163, 184, 0.3);
-            border-radius: 4px;
+        /* Right Side Panel - AI Analysis */
+        .right-panel {
+            left: auto;
+            right: 20px;
+            width: 320px;
+            background: rgba(15, 23, 42, 0.85);
+            /* Slightly more opaque for text reading */
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+        }
+
+        .ai-content {
+            font-size: 0.9rem;
+            color: #e2e8f0;
+            line-height: 1.6;
+            padding: 10px;
+        }
+
+        .ai-content p {
+            margin-bottom: 0.8rem;
+        }
+
+        .ai-content strong {
+            color: #3b82f6;
+        }
+
+        .ai-content ul {
+            padding-left: 1.2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .ai-content li {
+            margin-bottom: 0.4rem;
+        }
+
+        .ai-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #d946ef;
+            /* Pink */
+            font-size: 0.9rem;
+            padding: 20px;
+        }
+
+        /* Right Side Panel - Step-by-Step Log */
+        .right-panel {
+            left: auto;
+            right: 20px;
+            width: 280px;
+            background: rgba(15, 23, 42, 0.75);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .step-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .step-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            transition: all 0.3s ease;
+            position: relative;
+            padding-left: 16px;
+        }
+
+        .step-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: transparent;
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .step-item.active {
+            background: rgba(59, 130, 246, 0.15);
+            color: #f8fafc;
+            border-color: rgba(59, 130, 246, 0.4);
+            transform: translateX(-5px);
+        }
+
+        .step-item.active::before {
+            background: #3b82f6;
+        }
+
+        .step-item.future {
+            opacity: 0.5;
         }
 
         /* Custom Inputs & Buttons */
@@ -450,6 +549,85 @@
             pointer-events: none;
         }
 
+        /* Timeline Controls - Relocated */
+        .timeline-container {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 500px;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            padding: 12px 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 40;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .timeline-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #e2e8f0;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .timeline-slider {
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            height: 4px;
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .timeline-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #3b82f6;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #0f172a;
+        }
+
+        .step-label {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
         @media (max-width: 768px) {
             .controls-container {
                 width: 90% !important;
@@ -490,7 +668,7 @@
     <nav class="navbar">
         <a href="index.html" class="logo">
             <i data-lucide="zap" class="w-6 h-6 text-blue-500"></i>
-            <span>DSA</span>Visualizer
+            <span>DSA</span>Studio
         </a>
         <div class="hamburger" id="nav-toggle">
             <span></span>
@@ -552,6 +730,30 @@
         class="relative w-full h-[calc(100vh-6rem)] mt-24 border-t border-slate-700/50 shadow-2xl overflow-hidden">
 
         <div id="canvas-container"></div>
+
+        <div class="timeline-container">
+            <div class="timeline-controls">
+                <button class="control-btn" onclick="animController.first()" title="First">
+                    <i data-lucide="skip-back" class="w-4 h-4"></i>
+                </button>
+                <button class="control-btn" onclick="animController.prev()" title="Previous">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                </button>
+                <button class="control-btn" onclick="animController.togglePlay()" id="btn-play-pause"
+                    title="Play/Pause">
+                    <i data-lucide="play" class="w-4 h-4"></i>
+                </button>
+                <button class="control-btn" onclick="animController.next()" title="Next">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </button>
+                <button class="control-btn" onclick="animController.last()" title="Last">
+                    <i data-lucide="skip-forward" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <input type="range" id="timeline-slider" class="timeline-slider" min="0" max="0" value="0" step="1"
+                oninput="animController.scrub(this.value)">
+            <div class="step-label">Step <span id="current-step">0</span> / <span id="total-steps">0</span></div>
+        </div>
 
         <div class="ui-panel" id="ui-content">
             <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
@@ -621,9 +823,11 @@
                 </div>
             </div>
 
+
+
             <button class="action-btn btn-secondary mb-2" onclick="generateRandomTree()">Random Tree</button>
 
-            <div id="status-log"></div>
+            <div style="opacity: 0;" id="status-log"></div>
 
             <div class="legend">
                 <div class="legend-item">
@@ -643,6 +847,16 @@
             class="absolute top-5 left-5 bg-slate-800/80 p-2 rounded-lg border border-slate-700 text-white text-xs hidden hover:bg-slate-700">Show
             Controls</button>
 
+        <!-- Right Side Panel: Step-by-Step Logic -->
+        <div class="ui-panel right-panel" id="step-panel">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
+                <h2 class="text-sm font-bold text-blue-400 uppercase tracking-wider">operation analysis</h2>
+            </div>
+            <div id="step-list" class="step-list">
+                <div class="step-item">Details of the operation will appear here step by step.</div>
+            </div>
+        </div>
+
     </div>
 
     <script type="module">
@@ -652,7 +866,6 @@
         import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
         // --- Configuration ---
-        const apiKey = ""; // Add your Gemini API key here
         const isMobile = () => window.innerWidth < 768;
 
         // Colors (Matched to Theme)
@@ -680,9 +893,354 @@
                 this.height = 1;
                 this.x = 0;
                 this.y = 0;
-                this.mesh = null;
-                this.lbl = null;
-                this.ln = null;
+                // Note: removed mesh/lbl/ln from here as they will be managed by Renderer
+            }
+        }
+        function appendOperationStep(index, message) {
+            if (!message) return;
+
+            const list = document.getElementById('step-list');
+            if (!list) return;
+
+            // Remove placeholder
+            if (list.children.length === 1 && list.children[0].textContent.includes("Details")) {
+                list.innerHTML = "";
+            }
+
+            const item = document.createElement('div');
+            item.className = 'step-item future';
+            item.id = `step-item-${index}`;
+            item.innerHTML = message;
+
+            list.appendChild(item);
+        }
+
+
+        // --- NEW: Animation Controller System ---
+
+        class AnimationController {
+            constructor() {
+                this.frames = [];
+                this.currentFrameIndex = 0;
+                this.isPlaying = false;
+                this.playInterval = null;
+                this.speed = 1000; // ms per step (slow for clarity)
+            }
+
+            // Called by simulation functions to add a new state
+            recordFrame(rootNode, highlights = {}, message = "", logToUI = true) {
+                // 1️⃣ Serialize current tree state
+                const treeSnapshot = this.serializeTree(rootNode);
+
+                // 2️⃣ Step index = current frame position
+                const stepIndex = this.frames.length;
+
+                // 3️⃣ Store frame data
+                this.frames.push({
+                    tree: treeSnapshot,
+                    highlights: { ...highlights },
+                    message: message,
+                    stepIndex: stepIndex
+                });
+
+                // 4️⃣ Add entry to Operation Log (right panel)
+                if (logToUI && message) {
+                    appendOperationStep(stepIndex, message);
+                }
+
+                // 5️⃣ Update timeline slider + counters
+                this.updateUISlider();
+            }
+
+
+            serializeTree(node) {
+                if (!node) return null;
+                return {
+                    value: node.value,
+                    x: node.x,
+                    y: node.y,
+                    height: node.height,
+                    left: this.serializeTree(node.left),
+                    right: this.serializeTree(node.right)
+                };
+            }
+
+            reset() {
+                this.pause();
+                this.frames = [];
+                this.currentFrameIndex = 0;
+                this.updateUISlider();
+
+                const stepList = document.getElementById('step-list');
+                if (stepList) {
+                    stepList.innerHTML = '<div class="step-item">Details of the operation will appear here step by step.</div>';
+                }
+            }
+
+
+            // Removed generateStepList as we are using AI panel now
+            generateStepList() { }
+
+            startRecording() {
+                // If we are appending to existing state, we simulate "continuing"
+                // But usually we might want to capture the START state first if it's a new op
+                // For now, operations will just push frames.
+                // If we want to support "Undo" of entire operations later, we'd need multiple timelines.
+                // Current simplified model: One global timeline that appends.
+
+                // Correction: For "Playback" of an operation, it's best if the operation
+                // generates a localized sequence of frames (Animation Clip).
+                // BUT, to simplify "Previous Step" across the whole session, a global timeline is easier.
+                // Let's use a Global Timeline that keeps growing.
+            }
+
+            // Playback controls
+            updateUISlider() {
+                const slider = document.getElementById('timeline-slider');
+                const curStep = document.getElementById('current-step');
+                const totStep = document.getElementById('total-steps');
+
+                slider.max = Math.max(0, this.frames.length - 1);
+                slider.value = this.currentFrameIndex;
+
+                curStep.textContent = this.currentFrameIndex;
+                totStep.textContent = Math.max(0, this.frames.length - 1);
+            }
+
+            renderCurrentFrame() {
+                if (this.frames.length === 0) return;
+
+                const frame = this.frames[this.currentFrameIndex];
+
+                // Render the tree snapshot
+                renderFrame(frame.tree, frame.highlights);
+
+                // Update Log if needed (and we moved forward/packet has message)
+                // Note: scrubbing back might need to clear logs? 
+                // For simplicity: We only append logs when "Executing" existing logic. 
+                // In playback mode, maybe just show the message in a status div?
+                // Update Log if needed (and we moved forward/packet has message)
+                // Note: scrubbing back might need to clear logs? 
+                // For simplicity: We only append logs when "Executing" existing logic. 
+                // In playback mode, maybe just show the message in a status div?
+                if (frame.message) {
+                    // Update a specific status element instead of appending to log constantly during scrub
+                    document.getElementById('status-log').innerHTML = `<div>${frame.message}</div>`;
+                }
+
+                // NEW: Highlight the active step in the Right Panel
+                const listItems = document.querySelectorAll('.step-item');
+                listItems.forEach(item => {
+                    item.classList.remove('active');
+                    item.classList.add('future');
+                });
+
+                // Active item
+                const activeItem = document.getElementById(`step-item-${this.currentFrameIndex}`);
+                if (activeItem) {
+                    activeItem.classList.remove('future');
+                    activeItem.classList.add('active');
+                    
+                }
+
+                // Mark previous items as visited (not future)
+                for (let i = 0; i < this.currentFrameIndex; i++) {
+                    const prevItem = document.getElementById(`step-item-${i}`);
+                    if (prevItem) prevItem.classList.remove('future');
+                }
+
+                this.updateUISlider();
+            }
+
+            togglePlay() {
+                if (this.isPlaying) this.pause();
+                else this.play();
+            }
+
+            play() {
+                if (this.currentFrameIndex >= this.frames.length - 1) return; // At end
+
+                this.isPlaying = true;
+                const btn = document.getElementById('btn-play-pause');
+                if (btn) {
+                    btn.innerHTML = '<i data-lucide="pause" class="w-4 h-4"></i>';
+                    lucide.createIcons();
+                }
+
+                this.playInterval = setInterval(() => {
+                    if (this.currentFrameIndex < this.frames.length - 1) {
+                        this.currentFrameIndex++;
+                        this.renderCurrentFrame();
+                    } else {
+                        this.pause();
+                    }
+                }, this.speed);
+            }
+
+            pause() {
+                this.isPlaying = false;
+                clearInterval(this.playInterval);
+                const btn = document.getElementById('btn-play-pause');
+                if (btn) {
+                    btn.innerHTML = '<i data-lucide="play" class="w-4 h-4"></i>';
+                    lucide.createIcons();
+                }
+            }
+
+            next() {
+                this.pause();
+                if (this.currentFrameIndex < this.frames.length - 1) {
+                    this.currentFrameIndex++;
+                    this.renderCurrentFrame();
+                }
+            }
+
+            prev() {
+                this.pause();
+                if (this.currentFrameIndex > 0) {
+                    this.currentFrameIndex--;
+                    this.renderCurrentFrame();
+                }
+            }
+
+            first() {
+                this.pause();
+                this.currentFrameIndex = 0;
+                this.renderCurrentFrame();
+            }
+
+            last() {
+                this.pause();
+                this.currentFrameIndex = this.frames.length - 1;
+                this.renderCurrentFrame();
+            }
+
+            scrub(val) {
+                this.pause();
+                this.currentFrameIndex = parseInt(val);
+                this.renderCurrentFrame();
+            }
+        }
+
+        const animController = new AnimationController();
+        window.animController = animController; // Expose to global
+
+        // --- NEW: Mesh Cache Renderer ---
+        const meshCache = new Map(); // value -> { mesh, lbl, ln }
+
+        function renderFrame(nodeSnapshot, highlights) {
+            const activeValues = new Set();
+
+            // Recursive Traverse to mark active nodes and update/create meshes
+            function traverse(node, parentSnapshot) {
+                if (!node) return;
+
+                const val = node.value;
+                activeValues.add(val);
+
+                let cache = meshCache.get(val);
+
+                // 1. Create Color based on highlights
+                // highlights is a map/object: value -> color
+                let color = C_DEF;
+                if (highlights && highlights[val] !== undefined) {
+                    color = highlights[val];
+                }
+
+                // 2. Create/Update Mesh
+                if (!cache) {
+                    // Create new Group for Node
+                    const geometry = new THREE.SphereGeometry(1.6, 32, 32);
+                    const material = new THREE.MeshStandardMaterial({
+                        color: color,
+                        roughness: 0.2,
+                        metalness: 0.2
+                    });
+                    const mesh = new THREE.Mesh(geometry, material);
+                    scene.add(mesh);
+
+                    let lbl = null;
+                    if (font) {
+                        const textGeometry = new TextGeometry(String(val), {
+                            font: font,
+                            size: 0.7,
+                            height: 0.05
+                        });
+                        textGeometry.center();
+                        const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+                        lbl = new THREE.Mesh(textGeometry, textMaterial);
+                        scene.add(lbl);
+                    }
+
+                    cache = { mesh, lbl, ln: null };
+                    meshCache.set(val, cache);
+                }
+
+                // Update Props
+                // Smooth Lerp only if we are "playing", otherwise jump (for scrubbing)
+                // For simplicity, we just set position (the loop is managed by AnimController speed)
+                // But for smoothness, we can use lerp in the RequestAnimationFrame loop?
+                // No, let's just set position for now. The step-by-step is discrete.
+                cache.mesh.position.set(node.x, node.y, 0);
+                cache.mesh.material.color.setHex(color);
+                if (cache.lbl) {
+                    cache.lbl.position.set(node.x, node.y, 0).add(new THREE.Vector3(0, 0, 1.8));
+                }
+
+                // 3. Edges to Parent
+                if (parentSnapshot) {
+                    if (cache.ln) {
+                        scene.remove(cache.ln);
+                        cache.ln.geometry.dispose();
+                        cache.ln = null;
+                    }
+
+                    const start = new THREE.Vector3(parentSnapshot.x, parentSnapshot.y, 0);
+                    const end = new THREE.Vector3(node.x, node.y, 0);
+
+                    const direction = new THREE.Vector3().subVectors(end, start).normalize();
+                    const adjustedStart = start.clone().add(direction.clone().multiplyScalar(1.6));
+                    const adjustedEnd = end.clone().sub(direction.clone().multiplyScalar(1.6));
+
+                    const curve = new THREE.LineCurve3(adjustedStart, adjustedEnd);
+                    const tubeGeometry = new THREE.TubeGeometry(curve, 4, 0.1, 8, false);
+                    const tubeMaterial = new THREE.MeshBasicMaterial({ color: C_EDGE });
+
+                    cache.ln = new THREE.Mesh(tubeGeometry, tubeMaterial);
+                    scene.add(cache.ln);
+                } else {
+                    // Root or no parent, ensure no line
+                    if (cache.ln) {
+                        scene.remove(cache.ln);
+                        cache.ln.geometry.dispose();
+                        cache.ln = null;
+                    }
+                }
+
+                traverse(node.left, node);
+                traverse(node.right, node);
+            }
+
+            traverse(nodeSnapshot, null);
+
+            // Cleanup: Remove meshes not in activeValues
+            for (const [val, cache] of meshCache.entries()) {
+                if (!activeValues.has(val)) {
+                    scene.remove(cache.mesh);
+                    cache.mesh.geometry.dispose();
+                    cache.mesh.material.dispose();
+
+                    if (cache.lbl) {
+                        scene.remove(cache.lbl);
+                        cache.lbl.geometry.dispose();
+                        cache.lbl.material.dispose();
+                    }
+                    if (cache.ln) {
+                        scene.remove(cache.ln);
+                        cache.ln.geometry.dispose();
+                    }
+                    meshCache.delete(val);
+                }
             }
         }
 
@@ -924,105 +1482,8 @@
 
         // --- Rendering ---
 
-        // Clear Tree from Scene
-        function clearTreeFromScene() {
-            function removeNode(node) {
-                if (!node) return;
-
-                if (node.mesh) {
-                    scene.remove(node.mesh);
-                    node.mesh.geometry.dispose();
-                    node.mesh.material.dispose();
-                    node.mesh = null;
-                }
-
-                if (node.lbl) {
-                    scene.remove(node.lbl);
-                    node.lbl.geometry.dispose();
-                    node.lbl.material.dispose();
-                    node.lbl = null;
-                }
-
-                if (node.ln) {
-                    scene.remove(node.ln);
-                    node.ln.geometry.dispose();
-                    node.ln.material.dispose();
-                    node.ln = null;
-                }
-
-                removeNode(node.left);
-                removeNode(node.right);
-            }
-
-            removeNode(rootNode);
-        }
-
-        // Render Tree
-        function renderTree(node, parent = null) {
-            if (!node) return;
-
-            // Create node sphere if not exists
-            if (!node.mesh) {
-                const geometry = new THREE.SphereGeometry(1.6, 32, 32);
-                const material = new THREE.MeshStandardMaterial({
-                    color: C_DEF,
-                    roughness: 0.2,
-                    metalness: 0.2
-                });
-                node.mesh = new THREE.Mesh(geometry, material);
-                scene.add(node.mesh);
-
-                // Create text label if font is loaded
-                if (font) {
-                    const textGeometry = new TextGeometry(String(node.value), {
-                        font: font,
-                        size: 0.7,
-                        height: 0.05
-                    });
-                    textGeometry.center();
-
-                    const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-                    node.lbl = new THREE.Mesh(textGeometry, textMaterial);
-                    scene.add(node.lbl);
-                }
-            }
-
-            // Animate node to position
-            const targetPosition = new THREE.Vector3(node.x, node.y, 0);
-            node.mesh.position.lerp(targetPosition, 0.1);
-
-            // Update text label position
-            if (node.lbl) {
-                node.lbl.position.copy(node.mesh.position).add(new THREE.Vector3(0, 0, 1.8));
-            }
-
-            // Create edge to parent
-            if (parent) {
-                if (node.ln) {
-                    scene.remove(node.ln);
-                    node.ln.geometry.dispose();
-                    node.ln.material.dispose();
-                }
-
-                const start = new THREE.Vector3(parent.x, parent.y, 0);
-                const end = new THREE.Vector3(node.x, node.y, 0);
-
-                const direction = new THREE.Vector3().subVectors(end, start).normalize();
-                const adjustedStart = start.clone().add(direction.clone().multiplyScalar(1.6));
-                const adjustedEnd = end.clone().sub(direction.clone().multiplyScalar(1.6));
-
-                const curve = new THREE.LineCurve3(adjustedStart, adjustedEnd);
-                const tubeGeometry = new THREE.TubeGeometry(curve, 4, 0.1, 8, false);
-                const tubeMaterial = new THREE.MeshBasicMaterial({ color: C_EDGE });
-
-                node.ln = new THREE.Mesh(tubeGeometry, tubeMaterial);
-                scene.add(node.ln);
-            }
-
-            // Render children
-            renderTree(node.left, node);
-            renderTree(node.right, node);
-        }
+        // Render Tree (Legacy Wrapper for manual calls if any, or just empty as we replaced it)
+        // We will remove the old renderTree/clearTreeFromScene functions as they are replaced by AnimationSystem
 
         // --- UI Operations ---
 
@@ -1065,295 +1526,272 @@
         }
 
         // Insert Operation
-        window.performInsert = async (valueOverride = null) => {
-            if (isAnimating) {
-                logMessage("Please wait for current animation to complete");
-                return;
-            }
-
+        window.performInsert = (valueOverride = null) => {
             const value = valueOverride !== null ? parseInt(valueOverride) : parseInt(document.getElementById('nodeValue').value);
             if (isNaN(value)) {
-                logMessage("Please enter a valid number");
+                // logMessage("Please enter a valid number"); // TODO: Use status div?
+                alert("Please enter a valid number");
                 return;
             }
 
-            isAnimating = true;
-            logMessage(`Inserting ${value}...`);
+            animController.reset(); // clear timeline for new op
+            animController.startRecording();
+
+            // Record Start
+            animController.recordFrame(rootNode, {}, `Starting insertion of ${value}`);
 
             // Visualize insertion path
             let current = rootNode;
+            let parent = null;
+            // We need to simulate the path finding on the EXISTING tree structure first
+            // Note: The structure won't change until we actually insert.
+
             while (current) {
-                highlightNode(current, C_ACT);
-                await sleep(animationSpeed);
-                highlightNode(current, C_VIS);
+                // Highlight current
+                animController.recordFrame(rootNode, { [current.value]: C_ACT }, `Comparing ${value} with ${current.value}`);
 
                 if (value < current.value) {
                     current = current.left;
                 } else if (value > current.value) {
                     current = current.right;
                 } else {
-                    logMessage(`Value ${value} already exists in tree`);
-                    resetNodeColors(rootNode);
-                    isAnimating = false;
+                    animController.recordFrame(rootNode, { [current.value]: C_FND }, `Value ${value} already exists`);
+                    animController.play();
                     return;
                 }
             }
 
-            // Perform insertion
-            clearTreeFromScene();
+            // Perform insertion (Logic)
             if (treeType === 'BST') {
                 rootNode = insertBST(rootNode, value);
             } else {
                 rootNode = insertAVL(rootNode, value);
             }
 
+            // Update Layout
             updatePositions(rootNode, 0, 0, isMobile() ? 22 : 35);
-            renderTree(rootNode);
+
+            // Record Final State
+            animController.recordFrame(rootNode, { [value]: C_VIS }, `Inserted ${value}`); // Use value as key for new node highlight
 
             // Clear input
             if (!valueOverride) {
                 document.getElementById('nodeValue').value = "";
             }
 
-            await sleep(500);
-            resetNodeColors(rootNode);
-            isAnimating = false;
             updateStats();
-            logMessage(`Inserted ${value} successfully`);
+            updateStats();
+            updateStats();
+            // animController.generateStepList(); 
+            animController.play();
+            triggerAutoExplanation('Insertion', value);
         };
 
         // Delete Operation
-        window.performDelete = async (valueOverride = null) => {
-            if (isAnimating) {
-                logMessage("Please wait for current animation to complete");
-                return;
-            }
-
+        window.performDelete = (valueOverride = null) => {
             const value = valueOverride !== null ? parseInt(valueOverride) : parseInt(document.getElementById('nodeValue').value);
             if (isNaN(value)) {
-                logMessage("Please enter a valid number");
+                alert("Please enter a valid number");
                 return;
             }
 
-            // Check if value exists
+            // Check if value exists first (optional, but good for UI)
             let current = rootNode;
-            let parent = null;
-            while (current && current.value !== value) {
-                parent = current;
+            let found = false;
+            while (current) {
+                if (current.value === value) { found = true; break; }
                 current = value < current.value ? current.left : current.right;
             }
 
-            if (!current) {
-                logMessage(`Value ${value} not found in tree`);
+            if (!found) {
+                alert(`Value ${value} not found`);
                 return;
             }
 
-            isAnimating = true;
-            logMessage(`Deleting ${value}...`);
+            animController.reset();
+            animController.startRecording();
+            animController.recordFrame(rootNode, {}, `Starting deletion of ${value}`);
 
-            // Highlight the node to be deleted
-            highlightNode(current, C_ACT);
-            await sleep(animationSpeed * 2);
+            // Simulate Search Path for Deletion
+            current = rootNode;
+            while (current && current.value !== value) {
+                animController.recordFrame(rootNode, { [current.value]: C_ACT }, `Searching for ${value}...`);
+                current = value < current.value ? current.left : current.right;
+            }
+
+            if (current) {
+                animController.recordFrame(rootNode, { [current.value]: C_MAX }, `Found ${value}. Deleting...`);
+            }
 
             // Perform deletion
-            clearTreeFromScene();
             rootNode = deleteNode(rootNode, value, treeType);
 
             updatePositions(rootNode, 0, 0, isMobile() ? 22 : 35);
-            renderTree(rootNode);
 
-            isAnimating = false;
+            animController.recordFrame(rootNode, {}, `Deleted ${value}`);
             updateStats();
-            logMessage(`Deleted ${value} successfully`);
+            animController.recordFrame(rootNode, {}, `Deleted ${value}`);
+            updateStats();
+            // animController.generateStepList();
+            animController.play();
+            triggerAutoExplanation('Deletion', value);
         };
 
         // Search Operation
-        window.performSearch = async (valueOverride = null) => {
-            if (isAnimating) {
-                logMessage("Please wait for current animation to complete");
-                return;
-            }
-
+        window.performSearch = (valueOverride = null) => {
             const value = valueOverride !== null ? parseInt(valueOverride) : parseInt(document.getElementById('nodeValue').value);
             if (isNaN(value)) {
-                logMessage("Please enter a valid number");
+                alert("Please enter a valid number");
                 return;
             }
 
-            isAnimating = true;
-            resetNodeColors(rootNode);
-            logMessage(`Searching for ${value}...`);
+            animController.reset();
+            animController.startRecording();
+            animController.recordFrame(rootNode, {}, `Searching for ${value}...`);
 
             let current = rootNode;
             let found = false;
 
             while (current) {
-                highlightNode(current, C_ACT);
-                await sleep(animationSpeed);
+                animController.recordFrame(rootNode, { [current.value]: C_ACT }, `Checking ${current.value}...`);
 
                 if (current.value === value) {
                     found = true;
-                    highlightNode(current, C_FND);
-                    logMessage(`Found ${value}!`);
+                    animController.recordFrame(rootNode, { [current.value]: C_FND }, `Found ${value}!`);
                     break;
                 }
 
-                highlightNode(current, C_VIS);
+                animController.recordFrame(rootNode, { [current.value]: C_VIS }, `Passed ${current.value}`);
                 current = value < current.value ? current.left : current.right;
             }
 
             if (!found) {
-                logMessage(`${value} not found in tree`);
+                animController.recordFrame(rootNode, {}, `${value} not found`);
             }
 
-            await sleep(1000);
-            resetNodeColors(rootNode);
-            isAnimating = false;
+            animController.play();
+            triggerAutoExplanation('Search', value);
         };
 
         // Traversal Operations
-        window.performTraversal = async (type) => {
-            if (isAnimating) {
-                logMessage("Please wait for current animation to complete");
-                return;
-            }
+        window.performTraversal = (type) => {
+            if (!rootNode) return;
 
-            if (!rootNode) {
-                logMessage("Tree is empty");
-                return;
-            }
+            animController.reset();
+            animController.startRecording();
+            animController.recordFrame(rootNode, {}, `Starting ${type} traversal`);
 
-            isAnimating = true;
-            resetNodeColors(rootNode);
-            logMessage(`Performing ${type} traversal...`);
+            const nodes = [];
 
-            let nodes = [];
-            const result = [];
+            // Helper to collect nodes in order
+            // We want to animate them one by one.
+            // Actually, we should probably record the traversal logic step-by-step 
+            // but for simplicity, let's just collect the order and then animate the "visiting".
 
             switch (type) {
                 case 'inorder':
                     (function inorder(node) {
                         if (node) {
                             inorder(node.left);
-                            nodes.push(node);
+                            nodes.push(node.value);
                             inorder(node.right);
                         }
                     })(rootNode);
                     break;
-
                 case 'preorder':
                     (function preorder(node) {
                         if (node) {
-                            nodes.push(node);
+                            nodes.push(node.value);
                             preorder(node.left);
                             preorder(node.right);
                         }
                     })(rootNode);
                     break;
-
                 case 'postorder':
                     (function postorder(node) {
                         if (node) {
                             postorder(node.left);
                             postorder(node.right);
-                            nodes.push(node);
+                            nodes.push(node.value);
                         }
                     })(rootNode);
                     break;
-
                 case 'levelorder':
                     const queue = [rootNode];
                     while (queue.length > 0) {
                         const node = queue.shift();
                         if (node) {
-                            nodes.push(node);
-                            queue.push(node.left);
-                            queue.push(node.right);
+                            nodes.push(node.value);
+                            if (node.left) queue.push(node.left);
+                            if (node.right) queue.push(node.right);
                         }
                     }
                     break;
             }
 
-            // Animate traversal
-            for (let i = 0; i < nodes.length; i++) {
-                highlightNode(nodes[i], C_ACT);
-                result.push(nodes[i].value);
-                await sleep(animationSpeed);
-                highlightNode(nodes[i], C_VIS);
-            }
+            // Generate frames for each visited node
+            const visitedSet = {}; // To keep visited nodes green? Or just highlight active?
+            // Let's accumulate visited nodes in green.
 
-            logMessage(`${type.toUpperCase()}: ${result.join(' → ')}`);
-            await sleep(1000);
-            resetNodeColors(rootNode);
-            isAnimating = false;
+            nodes.forEach((val, idx) => {
+                const highlights = { ...visitedSet };
+                highlights[val] = C_ACT; // Current active
+                animController.recordFrame(rootNode, highlights, `${type}: ${val}`);
+
+                visitedSet[val] = C_VIS; // Mark as visited for next frames
+            });
+
+            // Final frame
+            animController.recordFrame(rootNode, visitedSet, `${type} traversal complete`);
+            // Final frame
+            animController.recordFrame(rootNode, visitedSet, `${type} traversal complete`);
+            // animController.generateStepList();
+            animController.play();
+            triggerAutoExplanation('Traversal', type);
         };
 
         // Find Min/Max
-        window.findMinMax = async (type) => {
-            if (isAnimating) {
-                logMessage("Please wait for current animation to complete");
-                return;
-            }
+        window.findMinMax = (type) => {
+            if (!rootNode) return;
 
-            if (!rootNode) {
-                logMessage("Tree is empty");
-                return;
-            }
+            animController.reset();
+            animController.startRecording();
+            animController.recordFrame(rootNode, {}, `Finding ${type}...`);
 
-            isAnimating = true;
-            resetNodeColors(rootNode);
+            let current = rootNode;
+            while (current) {
+                animController.recordFrame(rootNode, { [current.value]: C_ACT }, `Checking ${current.value}`);
 
-            let targetNode;
-            if (type === 'min') {
-                targetNode = findMinNode(rootNode);
-                logMessage("Finding minimum value...");
-            } else {
-                targetNode = findMaxNode(rootNode);
-                logMessage("Finding maximum value...");
-            }
-
-            if (targetNode) {
-                // Highlight path to target
-                let current = rootNode;
-                while (current) {
-                    highlightNode(current, C_ACT);
-                    await sleep(animationSpeed);
-
-                    if (current === targetNode) {
-                        highlightNode(current, type === 'min' ? C_MIN : C_MAX);
-                        logMessage(`${type === 'min' ? 'Minimum' : 'Maximum'} value is ${targetNode.value}`);
+                if (type === 'min') {
+                    if (!current.left) {
+                        animController.recordFrame(rootNode, { [current.value]: C_MIN }, `Found Minimum: ${current.value}`);
                         break;
                     }
-
-                    highlightNode(current, C_VIS);
-                    current = type === 'min' ? current.left : current.right;
+                    current = current.left;
+                } else {
+                    if (!current.right) {
+                        animController.recordFrame(rootNode, { [current.value]: C_MAX }, `Found Maximum: ${current.value}`);
+                        break;
+                    }
+                    current = current.right;
                 }
             }
-
-            await sleep(1500);
-            resetNodeColors(rootNode);
-            isAnimating = false;
+            animController.play();
         };
 
         // Generate Random Tree
         window.generateRandomTree = () => {
-            if (isAnimating) return;
+            // Instant generation, no timeline animation of insertion process
+            animController.reset();
 
-            logMessage("Generating random tree...");
-
-            // Clear existing tree
-            clearTreeFromScene();
             rootNode = null;
-
-            // Generate 8-12 random unique values
             const values = new Set();
             const count = Math.floor(Math.random() * 5) + 8; // 8-12 nodes
 
             while (values.size < count) {
-                values.add(Math.floor(Math.random() * 90) + 10); // 10-99
+                values.add(Math.floor(Math.random() * 90) + 10);
             }
 
-            // Insert values
             Array.from(values).forEach(value => {
                 if (treeType === 'BST') {
                     rootNode = insertBST(rootNode, value);
@@ -1363,30 +1801,33 @@
             });
 
             updatePositions(rootNode, 0, 0, isMobile() ? 22 : 35);
-            renderTree(rootNode);
             updateStats();
-            logMessage(`Generated random tree with ${count} nodes`);
+
+            // Just show one frame
+            animController.recordFrame(rootNode, {}, `Generated random tree with ${count} nodes`);
+            // No play() needed as we just want to see it.
+            // Actually, we must execute renderCurrentFrame manually because recordFrame updates index/slider
+            // but doesn't necessarily render? 
+            // recordFrame pushes to frames. We should render the last frame.
+            animController.generateStepList();
+            animController.last();
         };
 
         // Reset Tree
         window.resetTree = () => {
-            if (isAnimating) {
-                logMessage("Please wait for current animation to complete");
-                return;
-            }
-
-            clearTreeFromScene();
+            animController.reset();
             rootNode = null;
             updateStats();
-            logMessage("Tree cleared");
+            animController.recordFrame(null, {}, "Tree cleared");
+            // animController.generateStepList();
+            animController.renderCurrentFrame();
+            updateAIPanel("Tree Cleared.");
         };
 
         // Change Tree Type
         window.changeTreeType = () => {
             treeType = document.getElementById('treeType').value;
             const currentTree = [];
-
-            // Collect current tree values
             function collectValues(node) {
                 if (node) {
                     collectValues(node.left);
@@ -1396,9 +1837,8 @@
             }
             collectValues(rootNode);
 
-            // Clear and rebuild with new type
-            window.resetTree();
-
+            // Rebuild
+            rootNode = null;
             currentTree.forEach(value => {
                 if (treeType === 'BST') {
                     rootNode = insertBST(rootNode, value);
@@ -1408,9 +1848,12 @@
             });
 
             updatePositions(rootNode, 0, 0, isMobile() ? 22 : 35);
-            renderTree(rootNode);
             updateStats();
-            logMessage(`Switched to ${treeType === 'BST' ? 'Binary Search Tree' : 'AVL Tree'}`);
+
+            animController.reset();
+            animController.recordFrame(rootNode, {}, `Switched to ${treeType}`);
+            animController.generateStepList();
+            animController.last();
         };
 
         // Handle Enter Key
@@ -1419,6 +1862,221 @@
                 window.performInsert();
             }
         };
+
+        // --- GEMINI AI INTEGRATION (Fixed similar to array.html) ---
+
+        async function callGeminiAPI(userPrompt) {
+            // Get current tree state
+            const treeValues = [];
+            function collectTreeValues(node) {
+                if (node) {
+                    collectTreeValues(node.left);
+                    treeValues.push(node.value);
+                    collectTreeValues(node.right);
+                }
+            }
+            collectTreeValues(rootNode);
+
+            const stateData = {
+                treeType: treeType,
+                values: treeValues,
+                height: document.getElementById('stat-height').textContent,
+                nodeCount: document.getElementById('stat-nodes').textContent
+            };
+
+            const systemPrompt = `You are an AI assistant for a 3D Tree Visualizer. Analyze the user request and return a JSON response with:
+1. Explanation of what will happen
+2. List of commands to execute
+
+Current State:
+- Tree Type: ${stateData.treeType}
+- Node Count: ${stateData.nodeCount}
+- Tree Height: ${stateData.height}
+- Node Values: ${JSON.stringify(stateData.values)}
+
+Available Commands:
+- insert(value): Insert value into tree
+- delete(value): Delete value from tree
+- search(value): Search for value
+- traversal(type): Perform traversal (inorder, preorder, postorder, levelorder)
+- findMin(): Find minimum value
+- findMax(): Find maximum value
+- reset(): Clear the tree
+- random(): Generate random tree
+
+IMPORTANT: Return ONLY JSON in this format:
+{
+    "explanation": "Brief explanation here",
+    "commands": [
+        {"cmd": "commandName", "args": [arg1, arg2, ...]}
+    ]
+}`;
+
+            try {
+                // Try to connect to backend (same as array.html)
+                const response = await fetch("http://localhost:5000/api/gemini", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        userPrompt,
+                        systemPrompt
+                    })
+                });
+
+                if (!response.ok) {
+                    console.warn("Backend not available, using fallback.");
+                    return getFallbackResponse(userPrompt, stateData);
+                }
+
+                const data = await response.json();
+                console.log("Backend response:", data);
+
+                // Parse response - handle different formats
+                let parsedData;
+                if (typeof data === 'string') {
+                    parsedData = JSON.parse(data);
+                } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                    const text = data.candidates[0].content.parts[0].text;
+                    parsedData = JSON.parse(text);
+                } else {
+                    parsedData = data;
+                }
+
+                return parsedData;
+
+            } catch (error) {
+                console.warn("Connection error, using fallback response.");
+                return getFallbackResponse(userPrompt, stateData);
+            }
+        }
+
+        function getFallbackResponse(userPrompt, stateData) {
+            const prompt = userPrompt.toLowerCase();
+
+            // Simple fallback parser similar to array.html
+            if (prompt.includes('insert') || prompt.includes('add')) {
+                const values = extractAllNumbers(prompt);
+                const commands = values.map(val => ({ "cmd": "insert", "args": [val] }));
+                return {
+                    explanation: `**Insert Operation**: Inserting values ${values.join(', ')} into the ${stateData.treeType}.`,
+                    commands: commands
+                };
+            } else if (prompt.includes('search') || prompt.includes('find')) {
+                const value = extractNumber(prompt) || 42;
+                return {
+                    explanation: `**Search Operation**: Searching for value ${value} in the tree.`,
+                    commands: [{ "cmd": "search", "args": [value] }]
+                };
+            } else if (prompt.includes('delete') || prompt.includes('remove')) {
+                const value = extractNumber(prompt) || stateData.values[0] || 50;
+                return {
+                    explanation: `**Delete Operation**: Removing value ${value} from the tree.`,
+                    commands: [{ "cmd": "delete", "args": [value] }]
+                };
+            } else if (prompt.includes('traversal') || prompt.includes('traverse')) {
+                const types = ['inorder', 'preorder', 'postorder', 'levelorder'];
+                const type = types.find(t => prompt.includes(t)) || 'inorder';
+                return {
+                    explanation: `**Traversal Operation**: Performing ${type} traversal of the tree.`,
+                    commands: [{ "cmd": "traversal", "args": [type] }]
+                };
+            } else if (prompt.includes('min') || prompt.includes('minimum')) {
+                return {
+                    explanation: `**Find Minimum**: Finding the minimum value in the tree.`,
+                    commands: [{ "cmd": "findMin", "args": [] }]
+                };
+            } else if (prompt.includes('max') || prompt.includes('maximum')) {
+                return {
+                    explanation: `**Find Maximum**: Finding the maximum value in the tree.`,
+                    commands: [{ "cmd": "findMax", "args": [] }]
+                };
+            } else if (prompt.includes('reset') || prompt.includes('clear')) {
+                return {
+                    explanation: `**Reset Operation**: Clearing the entire tree.`,
+                    commands: [{ "cmd": "reset", "args": [] }]
+                };
+            } else if (prompt.includes('random')) {
+                return {
+                    explanation: `**Random Tree**: Generating a new random tree.`,
+                    commands: [{ "cmd": "random", "args": [] }]
+                };
+            }
+
+            // Default explanation for state
+            return {
+                explanation: `**Current State**: ${stateData.treeType} Tree with ${stateData.nodeCount} nodes, height ${stateData.height}. Values: ${stateData.values.join(', ')}.`,
+                commands: []
+            };
+        }
+
+        function extractNumber(text) {
+            const match = text.match(/\d+/);
+            return match ? parseInt(match[0]) : null;
+        }
+
+        function extractAllNumbers(text) {
+            const matches = text.match(/\d+/g);
+            return matches ? matches.map(Number) : [];
+        }
+
+        async function executeAICommands(commandList) {
+            if (!commandList || !Array.isArray(commandList)) {
+                console.error("Invalid command list:", commandList);
+                return;
+            }
+
+            // Simple execution: reset controller between commands or queue them?
+            // queueing is better for "simulate" feel.
+
+            // For now, execute one by one.
+            for (const item of commandList) {
+                const { cmd, args } = item;
+                console.log("Executing:", cmd, "with args:", args);
+
+                try {
+                    switch (cmd) {
+                        case 'insert':
+                            performInsert(args[0]);
+                            // Wait for animation equivalent? 
+                            // performInsert is synchronous in logic, but async in playback.
+                            // AI Simulation typically wants to just DO it or queue the animations.
+                            // Since we use the same controller, rapid firing might override.
+                            // We should probably chain them?
+                            // But performInsert resets logic.
+                            // Let's assume user sends one major command mostly.
+                            // Or we can modify performInsert to NOT reset if appendMode is on.
+                            break;
+                        case 'delete':
+                            performDelete(args[0]);
+                            break;
+                        case 'search':
+                            performSearch(args[0]);
+                            break;
+                        case 'traversal':
+                            performTraversal(args[0]);
+                            break;
+                        case 'reset':
+                            resetTree();
+                            break;
+                        case 'findMin':
+                            findMinMax('min');
+                            break;
+                        case 'findMax':
+                            findMinMax('max');
+                            break;
+                        case 'random':
+                            generateRandomTree();
+                            break;
+                    }
+
+                    // Simple hack: wait a bit before next command if multiple
+                    await sleep(1000);
+
+                } catch (e) {
+                    console.error("Error executing command:", e);
+                }
+            }
+        }
 
         // --- AI Functions ---
 
@@ -1440,98 +2098,35 @@
             aiLog.innerHTML = '<div class="loader"></div> Analyzing prompt...';
 
             try {
-                // Simple command parser (you can replace with actual Gemini API)
-                const commands = parseAIPrompt(prompt);
+                const aiResult = await callGeminiAPI(prompt);
 
-                aiLog.innerHTML = `Executing ${commands.length} operations...`;
-
-                for (let i = 0; i < commands.length; i++) {
-                    const cmd = commands[i];
-                    aiLog.innerHTML = `[${i + 1}/${commands.length}] ${cmd.operation} ${cmd.value || ''}`;
-
-                    switch (cmd.operation) {
-                        case 'insert':
-                            await performInsert(cmd.value);
-                            break;
-                        case 'search':
-                            await performSearch(cmd.value);
-                            break;
-                        case 'delete':
-                            await performDelete(cmd.value);
-                            break;
-                        case 'traversal':
-                            await performTraversal(cmd.value);
-                            break;
-                    }
-
-                    await sleep(800);
+                if (!aiResult) {
+                    aiLog.innerHTML = "❌ AI response error";
+                    return;
                 }
 
-                aiLog.innerHTML = `✅ Completed ${commands.length} operations`;
-                logMessage("AI simulation completed");
+                // Show explanation
+                const formattedExplanation = (aiResult.explanation || "").replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                aiLog.innerHTML = `💡 ${formattedExplanation}`;
+
+                if (aiResult.commands && aiResult.commands.length > 0) {
+                    // Update Panel instead of log
+                    updateAIPanel(aiResult.explanation);
+                    await executeAICommands(aiResult.commands);
+                }
 
             } catch (error) {
                 console.error("AI Simulation Error:", error);
-                aiLog.innerHTML = "❌ Error processing request";
-                logMessage("AI simulation failed");
+                updateAIPanel("❌ Error processing request");
             } finally {
                 btn.textContent = originalText;
                 btn.disabled = false;
+                // Don't hide the small log, maybe just clear it or repurpose
                 setTimeout(() => {
-                    aiLog.style.display = 'none';
-                }, 3000);
+                    // aiLog.style.display = 'none'; // Keep it hidden or remove it
+                }, 5000);
             }
         };
-
-        // Simple AI Prompt Parser (Replace with actual Gemini API)
-        function parseAIPrompt(prompt) {
-            const commands = [];
-            const words = prompt.toLowerCase().split(/\s+/);
-
-            for (let i = 0; i < words.length; i++) {
-                if (words[i] === 'insert' || words[i] === 'add') {
-                    let j = i + 1;
-                    while (j < words.length && !isNaN(parseInt(words[j]))) {
-                        commands.push({ operation: 'insert', value: parseInt(words[j]) });
-                        j++;
-                    }
-                    i = j - 1;
-                } else if (words[i] === 'search' || words[i] === 'find') {
-                    let j = i + 1;
-                    while (j < words.length && !isNaN(parseInt(words[j]))) {
-                        commands.push({ operation: 'search', value: parseInt(words[j]) });
-                        j++;
-                    }
-                    i = j - 1;
-                } else if (words[i] === 'delete' || words[i] === 'remove') {
-                    let j = i + 1;
-                    while (j < words.length && !isNaN(parseInt(words[j]))) {
-                        commands.push({ operation: 'delete', value: parseInt(words[j]) });
-                        j++;
-                    }
-                    i = j - 1;
-                } else if (words[i].includes('order') || words[i] === 'traversal') {
-                    const traversalTypes = ['inorder', 'preorder', 'postorder', 'levelorder'];
-                    for (const type of traversalTypes) {
-                        if (prompt.toLowerCase().includes(type)) {
-                            commands.push({ operation: 'traversal', value: type });
-                            break;
-                        }
-                    }
-                }
-            }
-
-            // Default to random operations if none found
-            if (commands.length === 0) {
-                commands.push(
-                    { operation: 'insert', value: Math.floor(Math.random() * 50) + 10 },
-                    { operation: 'insert', value: Math.floor(Math.random() * 50) + 60 },
-                    { operation: 'search', value: Math.floor(Math.random() * 50) + 35 }
-                );
-            }
-
-            return commands;
-        }
 
         // Explain Current State
         window.explainState = async () => {
@@ -1540,41 +2135,59 @@
             btn.textContent = "Analyzing...";
             btn.disabled = true;
 
-            const aiLog = document.getElementById('ai-log');
-            aiLog.style.display = 'block';
-            aiLog.innerHTML = '<div class="loader"></div> Analyzing tree structure...';
+            updateAIPanelLoading();
 
             try {
-                await sleep(1500); // Simulate API call
+                const explanationCmd = "Explain the current state of the tree data structure and the last operation performed.";
+                const aiResult = await callGeminiAPI(explanationCmd);
 
-                const height = document.getElementById('stat-height').textContent;
-                const nodeCount = document.getElementById('stat-nodes').textContent;
-
-                let explanation = `This is a ${treeType} with ${nodeCount} nodes and height ${height}. `;
-
-                if (nodeCount === '0') {
-                    explanation += "The tree is currently empty. Try inserting some values.";
-                } else if (parseInt(height) > 10) {
-                    explanation += "The tree is quite tall, which could affect search performance in BST.";
-                } else if (treeType === 'AVL') {
-                    explanation += "As an AVL tree, it maintains balance for optimal search times.";
+                if (aiResult && aiResult.explanation) {
+                    updateAIPanel(aiResult.explanation);
                 } else {
-                    explanation += "As a BST, search performance depends on how balanced the tree is.";
+                    updateAIPanel("❌ Could not generate explanation");
                 }
 
-                aiLog.innerHTML = `💡 ${explanation}`;
-                logMessage("AI explanation generated");
-
             } catch (error) {
-                aiLog.innerHTML = "❌ Could not generate explanation";
+                updateAIPanel("❌ Could not generate explanation");
             } finally {
                 btn.textContent = originalText;
                 btn.disabled = false;
-                setTimeout(() => {
-                    aiLog.style.display = 'none';
-                }, 5000);
             }
         };
+
+        // Helper to update AI Panel
+        function updateAIPanel(htmlContent) {
+            const panel = document.getElementById('ai-log');
+            const formatted = htmlContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n/g, '<br>');
+            panel.innerHTML = formatted;
+        }
+
+        function updateAIPanelLoading() {
+            const panel = document.getElementById('ai-log');
+            panel.innerHTML = '<div class="ai-loading"><div class="loader"></div> Gemini is thinking...</div>';
+        }
+
+        window.clearAI = () => {
+            document.getElementById('ai-log').innerHTML = '<div class="text-slate-500 text-center mt-10"><p>Ask Gemini to simulate an operation or use the controls to see AI explanation.</p></div>';
+        };
+
+        // Auto-Trigger AI for Manual Operations
+        async function triggerAutoExplanation(operation, value) {
+            // updateAIPanelLoading(); // Maybe too intrusive? Let's try it.
+            // Actually, let's show a "Scanning..." small text or just do it.
+            // The user wants AI analysis.
+            updateAIPanelLoading();
+            const prompt = `Explain the ${operation} operation of value ${value} on this ${treeType} tree. Describe the steps taken in simple words.`;
+            try {
+                const aiResult = await callGeminiAPI(prompt);
+                if (aiResult && aiResult.explanation) {
+                    updateAIPanel(aiResult.explanation);
+                }
+            } catch (e) {
+                console.error("Auto AI Error", e);
+            }
+        }
 
         // --- UI Controls ---
 
@@ -1627,7 +2240,6 @@
         function animate() {
             requestAnimationFrame(animate);
             controls.update();
-            renderTree(rootNode);
             renderer.render(scene, camera);
         }
 

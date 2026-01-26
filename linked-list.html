@@ -573,7 +573,7 @@
     <nav class="navbar">
         <a href="index.html" class="logo">
             <i data-lucide="zap" class="w-6 h-6 text-blue-500"></i>
-            <span>DSA</span>Visualizer
+            <span>DSA</span>Studio
         </a>
         <div class="hamburger" id="nav-toggle">
             <span></span>
@@ -726,6 +726,7 @@ struct Node {
     </div> <!-- End Visualization Wrapper -->
 
     <script>
+        // --- Modal Logic ---
         // --- Modal Logic ---
         // --- Modal Logic ---
         function openModal(type) {
@@ -1281,6 +1282,7 @@ IMPORTANT: Return ONLY JSON in this format:
 }`;
 
             try {
+                // Try to connect to backend, but use fallback if it fails
                 const response = await fetch("http://localhost:5000/api/gemini", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -1291,12 +1293,14 @@ IMPORTANT: Return ONLY JSON in this format:
                 });
 
                 if (!response.ok) {
-                    throw new Error("Backend not available - using fallback");
+                    console.warn("Backend not available, using fallback.");
+                    return getFallbackResponse(userPrompt, listData);
                 }
 
                 const data = await response.json();
                 console.log("Backend response:", data);
 
+                // Parse response - handle different formats
                 let parsedData;
                 if (typeof data === 'string') {
                     parsedData = JSON.parse(data);
@@ -1310,7 +1314,7 @@ IMPORTANT: Return ONLY JSON in this format:
                 return parsedData;
 
             } catch (error) {
-                console.log("Using fallback AI response:", error);
+                console.warn("Connection error, using fallback response.");
                 return getFallbackResponse(userPrompt, listData);
             }
         }
