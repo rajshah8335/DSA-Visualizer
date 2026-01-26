@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stack Theory | DSA Visualizer</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Theory Specific Styles */
+        .theory-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            padding-bottom: 4rem;
+            color: var(--text-primary);
+        }
+
+        .theory-section {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .theory-section:hover {
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .theory-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.2);
+            padding-bottom: 0.8rem;
+            display: inline-block;
+        }
+
+        .theory-subtitle {
+            font-size: 1.6rem;
+            color: #f1f5f9;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .theory-text {
+            line-height: 1.8;
+            color: #cbd5e1;
+            font-size: 1.15rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Lists */
+        .theory-list {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .theory-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.8rem;
+            color: #cbd5e1;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .theory-list li::before {
+            content: "•";
+            color: var(--accent-color);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Visuals */
+        .array-visual {
+            display: flex;
+            flex-direction: column-reverse;
+            /* Stack style */
+            align-items: center;
+            gap: 5px;
+            margin: 2.5rem 0;
+            padding: 1rem 0.5rem;
+        }
+
+        .stack-box {
+            width: 120px;
+            height: 50px;
+            background: rgba(59, 130, 246, 0.15);
+            border: 2px solid var(--accent-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Fira Code', monospace;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #fff;
+            position: relative;
+        }
+
+        .stack-container-vis {
+            border: 4px solid #475569;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 5px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* Tables */
+        .theory-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 2rem 0;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .theory-table th,
+        .theory-table td {
+            text-align: left;
+            padding: 1.2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .theory-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-color);
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .theory-table td {
+            color: #e2e8f0;
+            font-size: 1.05rem;
+        }
+
+        .theory-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .theory-table tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        /* Improved Code Blocks */
+        .code-container {
+            margin: 2.5rem 0;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #0f172a;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .code-header {
+            background: #1e293b;
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .code-lang {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .win-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot-red {
+            background: #ef4444;
+        }
+
+        .dot-yellow {
+            background: #eab308;
+        }
+
+        .dot-green {
+            background: #22c55e;
+        }
+
+        .code-block {
+            background: #0f172a;
+            /* Match container */
+            padding: 1.5rem 2rem;
+            /* More space */
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            margin: 0;
+            border: none;
+            border-radius: 0;
+        }
+
+        .code-block code {
+            color: #e2e8f0;
+            font-size: 1rem;
+            /* Larger font */
+            line-height: 1.8;
+            /* Better line spacing */
+            display: block;
+        }
+
+        /* Syntax Highlighting */
+        .keyword {
+            color: #c084fc;
+            font-weight: bold;
+        }
+
+        .type {
+            color: #3b82f6;
+        }
+
+        .func {
+            color: #facc15;
+        }
+
+        .string {
+            color: #4ade80;
+        }
+
+        .comment {
+            color: #64748b;
+            font-style: italic;
+        }
+
+        .number {
+            color: #f472b6;
+        }
+
+        .operator {
+            color: #cbd5e1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Background Animations -->
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar glass">
+        <a href="../index.html" class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
+            <span>DSA</span>Studio
+        </a>
+        <div class="hamburger" id="nav-toggle">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12h18M3 6h18M3 18h18" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </div>
+        <!-- Centered Tools -->
+        <div class="nav-center">
+            <a href="../stack.html" class="nav-link">3D Model</a>
+            <a href="#" class="nav-link active">Theory</a>
+            <a href="../quiz3.html" class="nav-link">Quiz</a>
+            <a href="/programs.html?filter=stack" class="nav-link">Program</a>
+        </div>
+
+        <div class="nav-links">
+            <a href="../index.html" class="nav-link">Home</a>
+            <a href="../topics.html" class="nav-link">Topics</a>
+            <a href="#" class="nav-link">About</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="app-container" style="display: block; overflow-y: auto;">
+
+        <header class="topics-header">
+            <h1 class="hero-title" style="margin-bottom: 0.5rem;">Stack Data Structure</h1>
+            <p class="theory-subtitle" style="margin-top: 0; color: #94a3b8; font-size: 1.2rem;">Detailed explanation,
+                analysis, and implementation.</p>
+        </header>
+
+        <div class="theory-container">
+
+            <!-- Section 1: Introduction -->
+            <div class="theory-section">
+                <h2 class="theory-title">What is a Stack?</h2>
+                <p class="theory-text">
+                    A <strong>Stack</strong> is a linear data structure that follows the <strong>LIFO (Last In, First
+                        Out)</strong> principle. This means that the last element added to the stack is the first one to
+                    be removed.
+                </p>
+                <p class="theory-text">
+                    Imagine a stack of plates: you place (push) a new plate on top, and you can only remove (pop) the
+                    top plate.
+                </p>
+
+                <h3 class="theory-subtitle">Visual Representation</h3>
+                <div class="array-visual">
+                    <div class="stack-container-vis">
+                        <div class="stack-box" style="border-color: #eab308; color: #eab308;">Top -> 30</div>
+                        <div class="stack-box">20</div>
+                        <div class="stack-box">10</div>
+                    </div>
+                </div>
+                <p class="theory-text"
+                    style="font-size: 0.95rem; color: #94a3b8; text-align: center; margin-top: 1rem;">
+                    <em>Figure 3.1: A stack containing elements 10, 20, 30.</em>
+                </p>
+            </div>
+
+            <!-- Section 2: Core Operations -->
+            <div class="theory-section">
+                <h2 class="theory-title">Core Operations</h2>
+                <h3 class="theory-subtitle">1. Push</h3>
+                <p class="theory-text">Adds an item to the top of the stack. If the stack is full, an overflow condition
+                    occurs.</p>
+
+                <h3 class="theory-subtitle">2. Pop</h3>
+                <p class="theory-text">Removes the item from the top of the stack. If the stack is empty, an underflow
+                    condition occurs.</p>
+
+                <h3 class="theory-subtitle">3. Peek / Top</h3>
+                <p class="theory-text">Returns the top element without removing it.</p>
+
+                <h3 class="theory-subtitle">4. isEmpty</h3>
+                <p class="theory-text">Checks if the stack is empty.</p>
+            </div>
+
+            <!-- Section 3: Pros and Cons -->
+            <div class="theory-section">
+                <h2 class="theory-title">Advantages & Disadvantages</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <h3 class="theory-subtitle" style="color: #4ade80; margin-top: 0;">Advantages</h3>
+                        <ul class="theory-list">
+                            <li><strong>Management:</strong> Efficient management of data in LIFO order.</li>
+                            <li><strong>Memory:</strong> Easy to manage memory (automatic allocation/deallocation in
+                                function calls).</li>
+                            <li><strong>Fast Operations:</strong> Push and Pop are O(1).</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="theory-subtitle" style="color: #f472b6; margin-top: 0;">Disadvantages</h3>
+                        <ul class="theory-list">
+                            <li><strong>Limited Access:</strong> Cannot access arbitrary elements; only the top is
+                                accessible.</li>
+                            <li><strong>Size Limit:</strong> Static stacks have fixed size (Risk of Stack Overflow).
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Complexity -->
+            <div class="theory-section">
+                <h2 class="theory-title">Complexity Analysis</h2>
+                <table class="theory-table">
+                    <thead>
+                        <tr>
+                            <th>Operation</th>
+                            <th>Time Complexity</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Push</strong></td>
+                            <td>O(1)</td>
+                            <td>Constant time to add to top.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pop</strong></td>
+                            <td>O(1)</td>
+                            <td>Constant time to remove from top.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Peek</strong></td>
+                            <td>O(1)</td>
+                            <td>Constant time to view top.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Search</strong></td>
+                            <td>O(n)</td>
+                            <td>Linear time to find an element within the stack.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section 5: Code Implementation -->
+            <div class="theory-section">
+                <h2 class="theory-title">Code Implementation</h2>
+                <p class="theory-text">Implementation using Array.</p>
+
+                <!-- C++ -->
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-controls">
+                            <div class="win-dot dot-red"></div>
+                            <div class="win-dot dot-yellow"></div>
+                            <div class="win-dot dot-green"></div>
+                        </div>
+                        <div class="code-lang">C++</div>
+                        <div style="width: 40px;"></div>
+                    </div>
+                    <div class="code-block">
+                        <pre><span class="keyword">#include</span> <span class="string">&lt;stack&gt;</span>
+<span class="keyword">using</span> <span class="keyword">namespace</span> std;
+
+<span class="keyword">int</span> <span class="func">main</span>() {
+    stack&lt;<span class="keyword">int</span>&gt; s;
+    <span class="comment">// Push</span>
+    s.push(<span class="number">10</span>);
+    s.push(<span class="number">20</span>);
+
+    <span class="comment">// Pop</span>
+    s.pop(); <span class="comment">// Removes 20</span>
+
+    <span class="comment">// Top</span>
+    <span class="keyword">int</span> top = s.top(); <span class="comment">// 10</span>
+    <span class="keyword">return</span> <span class="number">0</span>;
+}</pre>
+                    </div>
+                </div>
+
+                <!-- Java -->
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-controls">
+                            <div class="win-dot dot-red"></div>
+                            <div class="win-dot dot-yellow"></div>
+                            <div class="win-dot dot-green"></div>
+                        </div>
+                        <div class="code-lang">Java</div>
+                        <div style="width: 40px;"></div>
+                    </div>
+                    <div class="code-block">
+                        <pre><span class="keyword">import</span> java.util.Stack;
+
+<span class="keyword">public class</span> <span class="type">StackDemo</span> {
+    <span class="keyword">public static void</span> <span class="func">main</span>(<span class="type">String</span>[] args) {
+        <span class="type">Stack</span>&lt;<span class="type">Integer</span>&gt; s = <span class="keyword">new</span> <span class="type">Stack</span>&lt;&gt;();
+        
+        s.push(<span class="number">10</span>);
+        s.push(<span class="number">20</span>);
+        
+        s.pop(); <span class="comment">// Removes 20</span>
+        
+        <span class="type">System</span>.out.println(s.peek()); <span class="comment">// 10</span>
+    }
+}</pre>
+                    </div>
+                </div>
+
+                <!-- Python -->
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-controls">
+                            <div class="win-dot dot-red"></div>
+                            <div class="win-dot dot-yellow"></div>
+                            <div class="win-dot dot-green"></div>
+                        </div>
+                        <div class="code-lang">Python</div>
+                        <div style="width: 40px;"></div>
+                    </div>
+                    <div class="code-block">
+                        <pre>stack = []
+
+<span class="comment"># Push</span>
+stack.append(<span class="number">10</span>)
+stack.append(<span class="number">20</span>)
+
+<span class="comment"># Pop</span>
+stack.pop() <span class="comment"># Removes 20</span>
+
+<span class="comment"># Peek</span>
+top = stack[-1] <span class="comment"># 10</span></pre>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Section 6: Applications -->
+            <div class="theory-section">
+                <h2 class="theory-title">Applications</h2>
+                <ul class="theory-list">
+                    <li>Function Call Stack (Recursion).</li>
+                    <li>Expression Evaluation (Infix to Postfix).</li>
+                    <li>Undo/Redo features in text editors.</li>
+                    <li>Backtracking algorithms (Maze solving).</li>
+                    <li>Browser History (Back button).</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Mobile Toggle Logic
+        const navToggle = document.getElementById('nav-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        if (navToggle && navLinks) {
+            navToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                navToggle.classList.toggle('active');
+            });
+        }
+    </script>
+</body>
+
+</html>
