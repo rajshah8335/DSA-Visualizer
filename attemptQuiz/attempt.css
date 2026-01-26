@@ -1,0 +1,298 @@
+/* Attempt Quiz Specific Styles */
+
+/* Ensure body uses the main theme background */
+body {
+    padding-top: 0;
+    /* Override any padding */
+}
+
+/* Adjust the input wrap for the enter code section */
+.input-wrap {
+    display: flex;
+    gap: .6rem;
+    background: rgba(255, 255, 255, 0.05);
+    /* Glassy input background */
+    border: 1px solid var(--glass-border);
+    border-radius: 999px;
+    /* Pill shape */
+    padding: 6px;
+    max-width: 560px;
+}
+
+.input-wrap input {
+    flex: 1;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    padding: .8rem 1rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+/* Loading Overlay */
+.loading {
+    background-color: rgba(15, 23, 42, 0.9);
+    /* Dark overlay */
+    top: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    z-index: 2000;
+}
+
+.loadlogo {
+    border: none;
+    box-shadow: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Notification Styling */
+.notification {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    padding: 15px 25px;
+    font-size: 1rem;
+    border-radius: 12px;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.shownotification {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Question Styles */
+.result {
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    /* Glass card */
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    color: var(--text-primary);
+}
+
+.result h5 {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+/* Option Styles */
+/* Note: The JS generates typical radio/select inputs or similar. 
+   We need to ensure they look good. If the JS generates raw HTML string, we style relevant tags. */
+
+.result h4 {
+    color: var(--text-secondary);
+    /* Question number/label */
+    margin-bottom: 10px;
+}
+
+/* Select dropdown styling if used */
+select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.8);
+    color: var(--text-primary);
+    border: 1px solid var(--glass-border);
+    margin-top: 10px;
+}
+
+/* Custom styles for Correct/Incorrect feedback */
+.result p {
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+/* Score Bar */
+.markbar {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    margin: 20px auto;
+    overflow: hidden;
+}
+
+.markbar>div {
+    height: 100%;
+    background-color: var(--brand-2, #0bbd8b);
+    transition: width 1s ease-out;
+}
+
+/* Analysis Section Styles */
+.analysis-category {
+    margin-bottom: 25px;
+    padding: 20px;
+    border-radius: 12px;
+    background: rgba(30, 41, 59, 0.5);
+    border-left: 4px solid var(--accent-color);
+}
+
+.analysis-category h4 {
+    color: var(--accent-color);
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.analysis-category h4 i {
+    font-size: 1.2rem;
+}
+
+.analysis-item {
+    margin-bottom: 15px;
+    padding: 15px;
+    background: rgba(15, 23, 42, 0.3);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.analysis-item.correct {
+    border-left: 4px solid #10b981;
+}
+
+.analysis-item.incorrect {
+    border-left: 4px solid #ef4444;
+}
+
+.question-number {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    background: var(--accent-color);
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.improvement-tip {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.improvement-tip h5 {
+    color: var(--accent-color);
+    margin-bottom: 8px;
+    font-size: 1rem;
+}
+
+.improvement-tip p {
+    color: var(--text-secondary);
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.analysis-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: rgba(30, 41, 59, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-card .stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--accent-color);
+    margin-bottom: 5px;
+}
+
+.stat-card .stat-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .app-container {
+        padding-top: 20px;
+        /* Less padding on mobile */
+    }
+
+    .result {
+        padding: 1.5rem;
+    }
+    
+    .analysis-stats {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .analysis-category {
+        padding: 15px;
+    }
+}
+
+/* Button Styling matches style.css logic for glass theme */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .6rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 50px;
+    /* Pill shape matches navbar */
+    padding: .8rem 1.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    text-decoration: none;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+}
+
+.btn-primary {
+    background: var(--accent-color);
+    color: white;
+    /* Richer shadow for depth */
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-primary:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
+}
+
+.btn-ghost {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+}
+
+.btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
