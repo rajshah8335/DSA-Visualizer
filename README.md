@@ -14,3 +14,5 @@ Our project leverages powerful Google technologies: Firebase for secure authenti
 
 2) then open index.html file in the live server.
 
+**Please use your Gemini API key and add it to a file named .env inside the backend folder.**
+
